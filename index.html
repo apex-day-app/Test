@@ -4445,8 +4445,8 @@ function startGameLoop() {
     // Pichle round ka result dikhta rahega
     // Sirf loading class hatani hai agar ho toh
     if (resultBox) {
-        resultBox.classList.remove('loading'); // Agar loading ho toh hatao
-        // colour classes KO MAT HATAO - pichla result dikhta rahe
+        resultBox.classList.remove('loading');
+        // colour classes KO MAT HATAO
     }
     
     // Reset current bet
@@ -4466,7 +4466,7 @@ function startGameLoop() {
         blueBadge.style.display = 'none';
     }
     
-    // Update UI - Bet lists already empty hain endGameRound mein
+    // Update UI
     document.getElementById('green-total').textContent = '0';
     document.getElementById('blue-total').textContent = '0';
     
@@ -4485,7 +4485,7 @@ function startGameLoop() {
             clearInterval(gameInterval);
             gameInterval = null;
             isBettingActive = false;
-            endGameRound(); // Yeh 3 second wait karega phir naya result dikhayega
+            endGameRound();
         }
     }, 100);
 }
@@ -4495,7 +4495,6 @@ function processWinning(winningColor) {
     
     if (!userBetMap) return;
     
-    // जीतने वाले कलर पर लगे सभी बेट्स
     const winningBets = userBetMap[winningColor] || {};
     const winningUsers = Object.entries(winningBets);
     
@@ -4504,35 +4503,20 @@ function processWinning(winningColor) {
         return;
     }
     
-    // Calculate total bets on winning color
-    const totalWinningAmount = Object.values(winningBets).reduce((sum, bet) => sum + bet.amount, 0);
-    
-    // हर यूजर को उसके बेट के हिसाब से पैसे दो (2x)
     winningUsers.forEach(([userId, betData]) => {
         const winAmount = betData.amount * 2;
         
-        // सिर्फ अगर यह current user है तो बैलेंस अपडेट करो
         if (userId === currentUserData.userId) {
             const newBalance = currentUserData.balance + winAmount;
             currentUserData.balance = enforceMaxBalance(newBalance);
             
-            // Update stats
             currentUserData.totalWins = (currentUserData.totalWins || 0) + 1;
             currentUserData.gamesPlayed = (currentUserData.gamesPlayed || 0) + 1;
             
-            // Update localStorage
             if (currentUserData.userId) {
                 localStorage.setItem(`balance_${currentUserData.userId}`, currentUserData.balance);
                 localStorage.setItem(`wins_${currentUserData.userId}`, currentUserData.totalWins);
                 localStorage.setItem(`games_${currentUserData.userId}`, currentUserData.gamesPlayed);
-                
-                // Update Supabase
-                updateBalanceInSupabase(
-                    currentUserData.userId,
-                    currentUserData.balance,
-                    currentUserData.totalWins,
-                    currentUserData.gamesPlayed
-                );
             }
             
             showStatusMessage(`🎉 You won ₹${winAmount}!`, 'success');
@@ -4545,10 +4529,44 @@ function processWinning(winningColor) {
     loadUserStats();
 }
 
+function processRefund() {
+    console.log("💰 Processing refund for all users (tie)");
+    
+    const allBets = [];
+    
+    Object.entries(userBetMap.green || {}).forEach(([userId, betData]) => {
+        allBets.push({ userId, ...betData, color: 'green' });
+    });
+    
+    Object.entries(userBetMap.blue || {}).forEach(([userId, betData]) => {
+        allBets.push({ userId, ...betData, color: 'blue' });
+    });
+    
+    if (allBets.length === 0) return;
+    
+    allBets.forEach((bet) => {
+        if (bet.userId === currentUserData.userId) {
+            const refundAmount = bet.amount;
+            const newBalance = currentUserData.balance + refundAmount;
+            currentUserData.balance = enforceMaxBalance(newBalance);
+            
+            if (currentUserData.userId) {
+                localStorage.setItem(`balance_${currentUserData.userId}`, currentUserData.balance);
+            }
+            
+            showStatusMessage(`💰 Refund: ₹${refundAmount} returned (tie)`, 'success');
+        }
+        
+        console.log(`User ${bet.userId} refunded ₹${bet.amount}`);
+    });
+    
+    updateProfileDisplay();
+    loadUserStats();
+}
+
 function endGameRound() {
     console.log("🏁 Round ended - Waiting 3 seconds before showing new result...");
     
-    // Pehle result calculate karo (but show mat karo abhi)
     let resultColor = 'gray';
     
     if (gameState.totalGreenBets < gameState.totalBlueBets) {
@@ -4561,74 +4579,51 @@ function endGameRound() {
         resultColor = 'gray';
     }
     
-    // Store result for later use
     const roundResult = resultColor;
     
-    // IMPORTANT: Result button ko loading class do (move karega)
     const resultBox = document.getElementById('result-box');
     if (resultBox) {
-        // Purani colour classes hatao, loading class lagao
         resultBox.classList.remove('green-result', 'blue-result', 'gray-result');
-        resultBox.classList.add('loading'); // ✅ Yeh button move karega
+        resultBox.classList.add('loading');
     }
     
-    // Betting band karo
     isBettingActive = false;
     
-    // Status message update mat karo abhi
-    // History update mat karo abhi
-    
-    // 3 second delay ke baad naya result dikhao
     setTimeout(function() {
         console.log(`🎯 Showing new result: ${roundResult}`);
         
-        // Ab naya result button ka colour set karo
         if (resultBox) {
-            // Loading class hatao aur naya result lagao
-            resultBox.classList.remove('loading'); // ❌ Move band
-            resultBox.classList.add(roundResult + '-result'); // ✅ Colour
+            resultBox.classList.remove('loading');
+            resultBox.classList.add(roundResult + '-result');
         }
         
-        // Update history ab karo
         updateHistoryDisplay(roundResult);
         
-        // Status message show karo
         if (roundResult !== 'gray') {
             showStatusMessage(`🎯 Result: ${roundResult.toUpperCase()} wins!`, 'success');
+            processWinning(roundResult);
         } else {
             if (gameState.totalGreenBets === 0 && gameState.totalBlueBets === 0) {
                 showStatusMessage("🎲 No bets this round", 'info');
             }
             else if (gameState.totalGreenBets === gameState.totalBlueBets && gameState.totalGreenBets > 0) {
                 showStatusMessage("⚖️ Tie - Refunding all bets", 'info');
+                processRefund();
             }
             else {
                 showStatusMessage("😢 No winner this round", 'info');
             }
         }
         
-        // Winning amount distribute karo (agar koi winner ho)
-        if (roundResult !== 'gray') {
-            processWinning(roundResult);
-        }
-        
-        // Refund process karo agar tie ho
-        if (roundResult === 'gray' && gameState.totalGreenBets === gameState.totalBlueBets && gameState.totalGreenBets > 0) {
-            processRefund();
-        }
-        
-        // Clear bets for next round
         userBetMap = { green: {}, blue: {} };
         gameState.totalGreenBets = 0;
         gameState.totalBlueBets = 0;
         
-        // Update UI totals
         document.getElementById('green-total').textContent = '0';
         document.getElementById('blue-total').textContent = '0';
         updateBetListDisplay('green');
         updateBetListDisplay('blue');
         
-        // Baaj ko hide karo
         const greenBadge = document.getElementById('bet-amount-green');
         const blueBadge = document.getElementById('bet-amount-blue');
         
@@ -4642,17 +4637,15 @@ function endGameRound() {
             blueBadge.style.display = 'none';
         }
         
-        // 1 second delay ke baad naya round start karo
         setTimeout(function() {
             console.log("🔄 Starting new round...");
             gameLoopActive = false;
             startGameLoop();
         }, 1000);
         
-    }, 3000); // 3 second delay before showing new result
+    }, 3000);
 }
 
-// ⭐ यहाँ से PLACEBET फंक्शन शुरू होता है ⭐
 async function placeBet(color) {
     if (!isBettingActive) {
         showStatusMessage('Betting closed for this round!', 'error');
@@ -4679,10 +4672,8 @@ async function placeBet(color) {
     
     isPlacingBet = true;
     
-    // Balance kam karo
     currentUserData.balance -= betAmount;
     
-    // Bet map mein add
     const userKey = currentUserData.userId || 'demo_' + Date.now();
     if (!userBetMap[color]) userBetMap[color] = {};
     
@@ -4695,15 +4686,12 @@ async function placeBet(color) {
         };
     }
     
-    // Total update
-    currentBet[color] += betAmount;
     if (color === 'green') {
         gameState.totalGreenBets += betAmount;
     } else {
         gameState.totalBlueBets += betAmount;
     }
     
-    // Update UI
     updateBetListDisplay('green');
     updateBetListDisplay('blue');
     updateProfileDisplay();
@@ -4714,7 +4702,6 @@ async function placeBet(color) {
     if (greenTotal) greenTotal.textContent = Math.floor(gameState.totalGreenBets);
     if (blueTotal) blueTotal.textContent = Math.floor(gameState.totalBlueBets);
     
-    // === बैज अपडेट करें ===
     const greenBadge = document.getElementById('bet-amount-green');
     const blueBadge = document.getElementById('bet-amount-blue');
     
@@ -4735,13 +4722,9 @@ async function placeBet(color) {
             blueBadge.style.display = 'flex';
         }
     }
-    // === बैज अपडेट खत्म ===
     
-    // Save to localStorage
     if (currentUserData.userId) {
         localStorage.setItem(`balance_${currentUserData.userId}`, currentUserData.balance);
-        updateBalanceInSupabase(currentUserData.userId, currentUserData.balance)
-            .catch(err => console.error("Failed to update Supabase:", err));
     }
     
     showStatusMessage(`✅ Bet placed: ₹${betAmount} on ${color}`, 'success');
@@ -4751,55 +4734,6 @@ async function placeBet(color) {
     }, 300);
 }
 
-// ⭐ PLACEBET फंक्शन खत्म ⭐
-
-// ⭐ यहाँ से PROCESSREFUND फंक्शन शुरू होता है ⭐
-function processRefund() {
-    console.log("💰 Processing refund for all users (tie)");
-    
-    // सभी यूजर्स को उनका बेट वापस करो
-    const allBets = [];
-    
-    // Green bets
-    Object.entries(userBetMap.green || {}).forEach(([userId, betData]) => {
-        allBets.push({ userId, ...betData, color: 'green' });
-    });
-    
-    // Blue bets
-    Object.entries(userBetMap.blue || {}).forEach(([userId, betData]) => {
-        allBets.push({ userId, ...betData, color: 'blue' });
-    });
-    
-    if (allBets.length === 0) return;
-    
-    // हर यूजर को उसका बेट वापस करो
-    allBets.forEach((bet) => {
-        // सिर्फ अगर यह current user है तो बैलेंस अपडेट करो
-        if (bet.userId === currentUserData.userId) {
-            const refundAmount = bet.amount;
-            const newBalance = currentUserData.balance + refundAmount;
-            currentUserData.balance = enforceMaxBalance(newBalance);
-            
-            // Update localStorage
-            if (currentUserData.userId) {
-                localStorage.setItem(`balance_${currentUserData.userId}`, currentUserData.balance);
-                
-                // Update Supabase
-                updateBalanceInSupabase(currentUserData.userId, currentUserData.balance);
-            }
-            
-            showStatusMessage(`💰 Refund: ₹${refundAmount} returned (tie)`, 'success');
-        }
-        
-        console.log(`User ${bet.userId} refunded ₹${bet.amount}`);
-    });
-    
-    updateProfileDisplay();
-    loadUserStats();
-}
-// ⭐ PROCESSREFUND फंक्शन खत्म ⭐
-
-// ⭐ यहाँ से UPDATEBETLISTDISPLAY फंक्शन शुरू होता है ⭐
 function updateBetListDisplay(color) {
     const list = document.getElementById(`${color}-bets-list`);
     if (!list) return;
@@ -4824,7 +4758,6 @@ function updateBetListDisplay(color) {
     });
     list.innerHTML = html;
 }
-// ⭐ UPDATEBETLISTDISPLAY फंक्शन खत्म ⭐
 
 function updateHistoryDisplay(resultColor) {
     const hist = document.getElementById('result-history');
@@ -4839,7 +4772,6 @@ function updateHistoryDisplay(resultColor) {
     
     hist.insertBefore(newItem, hist.firstChild);
     
-    // Sirf 20 items rakho
     while (hist.children.length > 20) {
         hist.removeChild(hist.lastChild);
     }
@@ -5738,7 +5670,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 2000);
 });
 
-// ======================================== -->
+// ======================   ================== -->
 // 49.5 SIMPLE TEST - सब कुछ हटाकर यह डालो
 // ======================================== -->
 
