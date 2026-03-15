@@ -5738,6 +5738,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 2000);
 });
 
+// ======================================== -->
+// 49.5 SIMPLE TEST - सब कुछ हटाकर यह डालो
+// ======================================== -->
+
+console.log("🔵 SIMPLE TEST STARTED");
+
+// Simple timer
+let testCounter = 15;
+setInterval(() => {
+    testCounter = testCounter - 0.1;
+    if (testCounter <= 0) testCounter = 15;
+    const timerElement = document.querySelector('.timer-value');
+    if (timerElement) {
+        timerElement.textContent = testCounter.toFixed(1);
+        console.log("Timer updating:", testCounter.toFixed(1));
+    } else {
+        console.log("Timer element not found!");
+    }
+}, 100);
+
+// Set balance
+const balanceElement = document.getElementById('current-balance');
+if (balanceElement) {
+    balanceElement.textContent = "1000";
+    console.log("Balance set to 1000");
+} else {
+    console.log("Balance element not found!");
+}
+
+console.log("✅ SIMPLE TEST READY");
+
         // ======================================== -->
         // 50. EXPORT FUNCTIONS
         // ======================================== -->
