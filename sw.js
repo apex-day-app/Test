@@ -1,4 +1,4 @@
-const CACHE_NAME = 'notes-app-v3';
+const CACHE_NAME = 'notes-app-v4';
 const urlsToCache = [
   './',
   './index.html',
@@ -7,37 +7,24 @@ const urlsToCache = [
   './icon-512.png'
 ];
 
-// Install - cache immediately
+// इंस्टॉल होते ही तुरंत कैश करो
 self.addEventListener('install', event => {
+  self.skipWaiting(); // तुरंत एक्टिवेट हो जाओ
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      await cache.addAll(urlsToCache);
-      return cache;
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
-  self.skipWaiting(); // Activate immediately
 });
 
-// Fetch - CACHE FIRST (turant open ke liye)
+// पहले कैश से दो, नहीं मिला तो नेटवर्क से लाओ
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
-      // Cache mein mil gaya to turant return
-      if (response) {
-        return response;
-      }
-      // Nahi mila to network se lao aur cache karo
-      return fetch(event.request).then(networkResponse => {
-        return caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
-        });
-      });
+      return response || fetch(event.request);
     })
   );
 });
 
-// Activate - clean old caches and take control immediately
+// पुराना कैश हटाओ
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -48,8 +35,6 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(() => {
-      return clients.claim(); // Take control immediately
-    })
+    }).then(() => clients.claim())
   );
 });
