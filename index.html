@@ -1,2517 +1,462 @@
+<!DOCTYPE html>
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ APEX DAY - ADMIN PANEL (SUPABASE) ✨</title>
-    
-    <!-- ======================================================= -->
-    <!-- === SECTION 1: FONTS & ICONS === -->
-    <!-- ======================================================= -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- ======================================================= -->
-    <!-- === SECTION 2: SUPABASE SDK === -->
-    <!-- ======================================================= -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <style>
-    
-        /* ======================================================= */
-        /* === SECTION 3: ROOT VARIABLES & RESET === */
-        /* ======================================================= */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-gold: #FFD700;
-            --secondary-gold: #FFB800;
-            --dark-gold: #B8860B;
-            --light-gold: #FFF3CD;
-            --gradient-gold: linear-gradient(135deg, #FFD700, #FFB800, #FFA500);
-            --gradient-dark: linear-gradient(135deg, #2C3E50, #1A1A2E);
-            --shadow-gold: 0 10px 30px rgba(255, 215, 0, 0.25);
-            --shadow-deep: 0 15px 35px rgba(0, 0, 0, 0.2);
-            --text-dark: #2C3E50;
-            --text-gold: #B8860B;
-            --success-green: #28A745;
-            --danger-red: #DC3545;
-            --warning-orange: #FD7E14;
-            --info-blue: #17A2B8;
-            --radius: 16px;
-            --radius-sm: 8px;
-            --transition: all 0.3s ease;
-        }
-
-        body {
-            font-family: 'Noto Sans Devanagari', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: var(--text-dark);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 4: KEYFRAMES ANIMATIONS === */
-        /* ======================================================= */
-        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
-        @keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.05);opacity:0.9;} }
-        @keyframes slideIn { from{transform:translateX(-30px);opacity:0;} to{transform:translateX(0);opacity:1;} }
-        @keyframes rotate { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
-
-        /* ======================================================= */
-        /* === SECTION 5: FIXED HEADERS === */
-        /* ======================================================= */
-        .top-header-fixed {
-            background: #1a1a2e;
-            padding: 0 35px;
-            border-bottom: 3px solid #FFD700;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 105px;
-            width: 100%;
-        }
-
-        .nav-buttons-fixed {
-            background: #1a1a2e;
-            padding: 0 25px;
-            position: fixed;
-            top: 105px;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 4px solid #FFD700;
-            justify-content: center;
-            min-height: 126px;
-            width: 100%;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 6: MAIN CONTENT AREA === */
-        /* ======================================================= */
-        .admin-main {
-            flex: 1;
-            padding: 20px;
-            margin-top: 240px;
-            overflow-y: auto;
-            width: 100%;
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 7: CONTENT SECTIONS === */
-        /* ======================================================= */
-        .content-section {
-            display: none;
-            animation: fadeIn 0.5s ease;
-            width: 100%;
-        }
-        .content-section.active { display: block; }
-
-        /* ======================================================= */
-        /* === SECTION 8: CARDS === */
-        /* ======================================================= */
-        .section-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius);
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            box-shadow: var(--shadow-deep);
-            transition: var(--transition);
-            width: 100%;
-        }
-        .section-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-gold);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-        }
-        .card-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .card-header h2 i { color: var(--primary-gold); }
-
-        .badge {
-            background: var(--gradient-gold);
-            color: var(--text-dark);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 9: STATS GRID === */
-        /* ======================================================= */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: linear-gradient(145deg, #ffffff, #f8f9fa);
-            border-radius: var(--radius);
-            padding: 25px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border: 2px solid transparent;
-            transition: var(--transition);
-        }
-        .stat-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            border-color: var(--primary-gold);
-            box-shadow: var(--shadow-gold);
-        }
-        .stat-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--gradient-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: var(--text-dark);
-            animation: pulse 2s infinite;
-        }
-        .stat-info h3 { font-size: 1rem; color: var(--text-dark); opacity: 0.8; margin-bottom: 5px; }
-        .stat-info p { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
-
-        /* ======================================================= */
-        /* === SECTION 10: SEARCH SECTION === */
-        /* ======================================================= */
-        .search-section {
-            background: white;
-            border-radius: var(--radius);
-            padding: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 25px;
-        }
-        .search-section input {
-            flex: 1;
-            min-width: 250px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: var(--radius-sm);
-            font-size: 1rem;
-            font-family: inherit;
-        }
-        .search-section input:focus {
-            outline: none;
-            border-color: var(--primary-gold);
-            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.2);
-        }
-        .search-section button {
-            background: var(--gradient-gold);
-            color: var(--text-dark);
-            border: none;
-            padding: 15px 25px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 700;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .search-section button:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-gold);
-        }
-
-        /* ======================================================= */
-        /* === SECTION 11: USERS LIST === */
-        /* ======================================================= */
-        .users-list {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .user-item {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-            transition: var(--transition);
-            background: white;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .user-item:hover {
-            background: linear-gradient(90deg, #FFF9E6, #ffffff);
-            transform: translateX(5px);
-            box-shadow: var(--shadow-gold);
-        }
-
-        .user-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: var(--primary-gold);
-        }
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            background: var(--gradient-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dark);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        .user-info { flex: 1; min-width: 200px; }
-        .user-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .user-email { color: var(--text-dark); opacity: 0.7; font-size: 0.9rem; }
-        .user-id {
-            font-size: 0.8rem;
-            color: var(--primary-gold);
-            background: rgba(255, 215, 0, 0.1);
-            padding: 3px 8px;
-            border-radius: 4px;
-        }
-        .user-balance {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--success-green);
-            margin: 0 20px;
-        }
-        .user-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .status-active { background: #D4EDDA; color: var(--success-green); border: 1px solid #C3E6CB; }
-        .status-blocked { background: #F8D7DA; color: var(--danger-red); border: 1px solid #F5C6CB; }
-        .status-deleted { background: #E2E3E5; color: #6C757D; border: 1px solid #D6D8DB; }
-
-        .user-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .action-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-        }
-        .action-btn.view { background: var(--info-blue); color: white; }
-        .action-btn.edit { background: var(--warning-orange); color: white; }
-        .action-btn.delete { background: var(--danger-red); color: white; }
-        .action-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 12: REQUESTS LIST === */
-        /* ======================================================= */
-        .requests-list {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-        }
-        .request-item {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition);
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .request-item:hover {
-            background: rgba(255, 215, 0, 0.05);
-            transform: translateX(5px);
-        }
-        .request-info h4 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text-dark); }
-        .request-info p { margin-bottom: 5px; color: var(--text-dark); opacity: 0.8; }
-        .request-amount { font-size: 1.2rem; font-weight: 700; color: var(--primary-gold); }
-
-        .request-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .approve-btn {
-            background: var(--success-green);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .reject-btn {
-            background: var(--danger-red);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .approve-btn:hover, .reject-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        /* ======================================================= */
-        /* === SECTION 13: PROMO GRID === */
-        /* ======================================================= */
-        .promo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .promo-card {
-            background: linear-gradient(145deg, #ffffff, #f8f9fa);
-            border-radius: var(--radius);
-            padding: 20px;
-            border: 2px solid transparent;
-            transition: var(--transition);
-        }
-        .promo-card:hover {
-            border-color: var(--primary-gold);
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-gold);
-        }
-        .promo-code {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--text-dark);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-        .promo-amount {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary-gold);
-            margin-bottom: 10px;
-        }
-        .promo-stats {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-            color: var(--text-dark);
-            opacity: 0.8;
-        }
-
-        .history-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 14: MODAL === */
-        /* ======================================================= */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: white;
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 25px;
-            border: 3px solid var(--primary-gold);
-            box-shadow: var(--shadow-gold);
-            animation: slideIn 0.3s ease;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-dark);
-            transition: var(--transition);
-        }
-        .close-btn:hover {
-            color: var(--danger-red);
-            transform: rotate(90deg);
-        }
-
-        /* ======================================================= */
-        /* === SECTION 15: LOADING & TOAST === */
-        /* ======================================================= */
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(255, 215, 0, 0.3);
-            border-top: 3px solid var(--primary-gold);
-            border-radius: 50%;
-            animation: rotate 1s linear infinite;
-            margin: 20px auto;
-            display: block;
-        }
-        .toast-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: var(--radius);
-            color: white;
-            font-weight: 600;
-            z-index: 9999;
-            animation: slideIn 0.3s ease;
-            box-shadow: var(--shadow-deep);
-        }
-        .toast-success { background: var(--success-green); }
-        .toast-error { background: var(--danger-red); }
-
-        /* ======================================================= */
-        /* === SECTION 16: CONNECTION DOT === */
-        /* ======================================================= */
-        #connectionStatusDot {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 10px 24px;
-            border-radius: 50px;
-            background: rgba(255,255,255,0.1);
-            height: 65px;
-            transition: var(--transition);
-        }
-        #connectionStatusDot:hover { background: rgba(255, 215, 0, 0.2) !important; }
-        #dot {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-        #connectionText {
-            color: rgba(255,255,255,0.9);
-            font-size: 1.4rem;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 17: HEADER BUTTONS === */
-        /* ======================================================= */
-        .header-btn {
-            background: transparent;
-            color: #2C3E50;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 400;
-            font-size: 0.8rem;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .header-btn i { color: #FFD700; }
-        .header-btn:hover {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: #FFD700;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 18: NAVIGATION BUTTONS === */
-        /* ======================================================= */
-        .nav-btn-bottom {
-            background: transparent;
-            border: 2px solid #FFD700;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 35px;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            height: 45px;
-            min-width: 110px;
-            justify-content: center;
-            font-weight: 500;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-        .nav-btn-bottom i { color: #FFD700; font-size: 1.1rem; }
-        .nav-btn-bottom:hover {
-            background: rgba(255, 215, 0, 0.15);
-            transform: translateY(-2px);
-        }
-        .nav-btn-bottom.active {
-            background: linear-gradient(135deg, #FFC800, #FFA500, #FF8C00);
-            color: #000000;
-            font-weight: 700;
-            border: 2px solid #FFA500;
-            box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
-        }
-        .nav-btn-bottom.active i { color: #000000; }
-        .count-badge {
-            background: #FFD700;
-            color: #000000;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-left: 5px;
-        }
-
-        /* ======================================================= */
-        /* === SECTION 19: RESPONSIVE === */
-        /* ======================================================= */
-        @media (max-width: 1024px) {
-            .user-item { flex-direction: column; align-items: flex-start; }
-            .user-actions { width: 100%; justify-content: flex-start; }
-            .nav-btn-bottom { min-width: 90px; padding: 6px 12px; font-size: 0.9rem; }
-        }
-        @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .search-section { flex-direction: column; }
-            .search-section input { width: 100%; }
-            .request-item { flex-direction: column; align-items: flex-start; }
-            .request-actions { width: 100%; }
-            .request-actions button { flex: 1; }
-            .admin-main { padding: 10px; }
-            .section-card { padding: 15px; }
-            .nav-btn-bottom { min-width: 70px; padding: 4px 8px; font-size: 0.8rem; }
-            .top-header-fixed { padding: 0 15px; }
-            .nav-buttons-fixed { padding: 0 10px; }
-            #connectionText { font-size: 1rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>नोट्स - तुरंत खुलने वाला</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#000;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;padding-bottom:70px}
+.top-bar{background:#1a1a1a;padding:12px 16px;border-bottom:2px solid #ffd966;position:sticky;top:0;z-index:100}
+.app-title{font-size:1.5rem;font-weight:700;color:#ffd966}
+.folder-scroll{background:#0d0d0d;padding:8px 0;overflow-x:auto;white-space:nowrap;display:flex;gap:8px;padding-left:12px;padding-right:12px;border-bottom:1px solid #222}
+.folder-item{background:#2a2a2a;padding:6px 18px;border-radius:30px;font-size:0.85rem;font-weight:600;color:#ddd;cursor:pointer;display:inline-block;transition:all 0.1s}
+.folder-item.active{background:#ffd966;color:#000}
+.folder-item:active{transform:scale(0.96)}
+.notes-list{display:flex;flex-direction:column;gap:8px;padding:12px}
+.note-item{background:#1a1a1a;border-radius:16px;padding:12px;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.05s}
+.note-item.selected{background:#2a2a2a;border:2px solid #ffd966}
+.note-title{font-size:1rem;font-weight:600;color:#fff;margin-bottom:6px;display:flex;gap:8px;align-items:center}
+.note-number{background:#2a2a2a;padding:2px 8px;border-radius:12px;font-size:0.7rem;color:#aaa}
+.note-preview{font-size:0.8rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty-card{background:#111;border-radius:16px;padding:12px;border:1px dashed #444}
+.empty-card-header{background:#1a1a1a;padding:10px;border-radius:12px;margin-bottom:8px;font-weight:600;color:#ddd;outline:none}
+.empty-text-input{width:100%;background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:12px;color:#fff;font-size:0.9rem;outline:none;margin:8px 0}
+.empty-text-input:focus{border-color:#ffd966}
+button{background:#2a2a2a;border:none;padding:6px 14px;border-radius:20px;color:#fff;font-weight:600;cursor:pointer;transition:all 0.05s}
+button:active{transform:scale(0.95)}
+.copy-btn,.paste-btn{background:#333;padding:4px 10px;font-size:0.7rem}
+.save-inside-text{background:#ffd966;color:#000;margin-top:8px;width:100%}
+.selection-toolbar{position:fixed;bottom:0;left:0;right:0;background:#2e7d32;padding:12px;display:flex;justify-content:space-between;z-index:200;transform:translateY(100%);transition:transform 0.2s}
+.selection-toolbar.show{transform:translateY(0)}
+.fullscreen-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a0a;z-index:1000;padding:20px;overflow-y:auto}
+.fullscreen-header{display:flex;justify-content:space-between;margin-bottom:20px}
+.fullscreen-header input{background:#1a1a1a;border:none;color:#fff;font-size:1.3rem;font-weight:600;padding:8px;border-radius:12px;flex:1;margin-right:12px;outline:none}
+.fullscreen-content{background:#111;padding:16px;border-radius:16px;color:#ddd;font-size:1rem;line-height:1.5;min-height:200px;outline:none}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 16px;border-radius:40px;font-size:0.8rem;z-index:1100;animation:fadeOut 0.8s forwards}
+@keyframes fadeOut{0%{opacity:1}70%{opacity:1}100%{opacity:0;visibility:hidden}}
+</style>
 </head>
 <body>
 
-<!-- ======================================================= -->
-<!-- === SECTION 20: FIXED HEADERS === -->
-<!-- ======================================================= -->
-<div class="top-header-fixed">
-    <div style="color: white; font-size: clamp(1.5rem, 4vw, 3.2rem); font-weight: 800; letter-spacing: 2px;">
-        APEX DAY ADMIN
-    </div>
-    
-    <div id="connectionStatusDot" onclick="checkConnection()">
-        <span id="dot" style="background: #6c757d;"></span>
-        <span id="connectionText">Checking...</span>
-    </div>
+<div class="top-bar">
+  <div class="app-title">📝 मेरे नोट्स</div>
 </div>
 
-<!-- NAVIGATION BUTTONS - FIXED -->
-<div class="nav-buttons-fixed">
-    <button class="nav-btn-bottom" id="nav-dashboard" onclick="showSection('dashboard')">
-        <i class="fas fa-tachometer-alt"></i> Dashboard
-    </button>
-    <button class="nav-btn-bottom" id="nav-users" onclick="showSection('users')">
-        <i class="fas fa-users"></i> Users
-    </button>
-    <button class="nav-btn-bottom" id="nav-transactions" onclick="showSection('transactions')">
-        <i class="fas fa-exchange-alt"></i> Transactions
-    </button>
-    <button class="nav-btn-bottom" id="nav-add-money" onclick="showSection('add-money')">
-        <i class="fas fa-plus-circle"></i> Add Money
-        <span class="count-badge" id="add-money-count">0</span>
-    </button>
-    <button class="nav-btn-bottom" id="nav-withdrawals" onclick="showSection('withdrawals')">
-        <i class="fas fa-minus-circle"></i> Withdrawals
-        <span class="count-badge" id="withdrawal-count">0</span>
-    </button>
-    <button class="nav-btn-bottom" id="nav-promos" onclick="showSection('promos')">
-        <i class="fas fa-gift"></i> Promos
-    </button>
-    <button class="nav-btn-bottom" id="nav-notifications" onclick="showSection('notifications')">
-        <i class="fas fa-bell"></i> Notifications
-    </button>
-    <button class="nav-btn-bottom" id="nav-analytics" onclick="showSection('analytics')">
-        <i class="fas fa-chart-line"></i> Analytics
-    </button>
-    <button class="nav-btn-bottom" id="nav-settings" onclick="showSection('settings')">
-        <i class="fas fa-cog"></i> Settings
-    </button>
+<div id="foldersList" class="folder-scroll"></div>
+
+<div class="notes-container">
+  <div id="notesListArea" class="notes-list"></div>
 </div>
 
-<!-- ======================================================= -->
-<!-- === SECTION 21: MAIN CONTENT === -->
-<!-- ======================================================= -->
-<main class="admin-main" id="mainContent">
-    
-    <!-- === SECTION 22: DASHBOARD === -->
-    <div id="dashboard" class="content-section">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-users"></i></div>
-                <div class="stat-info">
-                    <h3>Total Users</h3>
-                    <p id="total-users">0</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-wallet"></i></div>
-                <div class="stat-info">
-                    <h3>Total Balance</h3>
-                    <p id="total-balance">₹0</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-coins"></i></div>
-                <div class="stat-info">
-                    <h3>Today's Profit</h3>
-                    <p id="today-profit">₹0</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-info">
-                    <h3>Pending Requests</h3>
-                    <p id="pending-count">0</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-history"></i> Recent Activity</h2>
-                <span class="badge"><i class="fas fa-bolt"></i> Live</span>
-            </div>
-            <div id="recent-activity" class="requests-list">
-                <div class="loading-spinner"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- === SECTION 23: USERS === -->
-    <div id="users" class="content-section">
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-users"></i> User Management</h2>
-                <div class="badge"><span id="selected-count">0</span> Selected</div>
-            </div>
-            <div class="search-section">
-                <input type="text" id="user-search" placeholder="Search by name, email or ID...">
-                <button onclick="searchUsers()"><i class="fas fa-search"></i> Search</button>
-                <button onclick="clearSelection()"><i class="fas fa-times"></i> Clear</button>
-                <button onclick="exportUsers()"><i class="fas fa-download"></i> Export</button>
-            </div>
-            <div class="action-buttons">
-                <button class="action-btn delete" onclick="bulkDeleteUsers()"><i class="fas fa-trash-alt"></i> Delete Selected</button>
-                <button class="action-btn" style="background: var(--warning-orange);" onclick="bulkBlockUsers()"><i class="fas fa-ban"></i> Block Selected</button>
-                <button class="action-btn" style="background: var(--success-green);" onclick="bulkUnblockUsers()"><i class="fas fa-check"></i> Unblock Selected</button>
-                <button class="action-btn" style="background: var(--info-blue);" onclick="bulkAddBalance()"><i class="fas fa-plus-circle"></i> Add Balance</button>
-            </div>
-            <div id="users-list" class="users-list"><div class="loading-spinner"></div></div>
-            <div id="users-pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;"></div>
-        </div>
-    </div>
-
-    <!-- === SECTION 24: ADD MONEY === -->
-    <div id="add-money" class="content-section">
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-plus-circle"></i> Add Money Requests</h2>
-                <span class="badge" id="add-money-total">0 Pending</span>
-            </div>
-            <div class="requests-list" id="add-money-requests"><div class="loading-spinner"></div></div>
-        </div>
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-history"></i> Add Money History</h2>
-                <button class="header-btn" onclick="refreshAddMoneyHistory()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <div class="history-filters">
-                <button class="header-btn" onclick="loadAddMoneyHistory('all')">All</button>
-                <button class="header-btn" onclick="loadAddMoneyHistory('approved')">Approved</button>
-                <button class="header-btn" onclick="loadAddMoneyHistory('rejected')">Rejected</button>
-                <button class="header-btn" onclick="loadAddMoneyHistory('pending')">Pending</button>
-            </div>
-            <div id="add-money-history" class="requests-list"><div class="loading-spinner"></div></div>
-        </div>
-    </div>
-
-    <!-- === SECTION 25: WITHDRAWALS === -->
-    <div id="withdrawals" class="content-section">
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-minus-circle"></i> Withdrawal Requests</h2>
-                <span class="badge" id="withdrawal-total">0 Pending</span>
-            </div>
-            <div class="requests-list" id="withdrawal-requests"><div class="loading-spinner"></div></div>
-        </div>
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-history"></i> Withdrawal History</h2>
-                <button class="header-btn" onclick="refreshWithdrawalHistory()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <div class="history-filters">
-                <button class="header-btn" onclick="loadWithdrawalHistory('all')">All</button>
-                <button class="header-btn" onclick="loadWithdrawalHistory('approved')">Approved</button>
-                <button class="header-btn" onclick="loadWithdrawalHistory('rejected')">Rejected</button>
-                <button class="header-btn" onclick="loadWithdrawalHistory('pending')">Pending</button>
-            </div>
-            <div id="withdrawal-history" class="requests-list"><div class="loading-spinner"></div></div>
-        </div>
-    </div>
-
-    <!-- === SECTION 26: PROMOS === -->
-    <div id="promos" class="content-section">
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-plus-circle"></i> Create Promo Code</h2>
-            </div>
-            <div style="display: grid; gap: 20px; max-width: 500px;">
-                <input type="text" id="promo-code" placeholder="PROMO CODE" style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1.2rem; text-transform: uppercase;">
-                <input type="number" id="promo-amount" placeholder="Amount (₹)" style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1.2rem;" value="100">
-                <input type="number" id="promo-limit" placeholder="Usage Limit (leave empty for unlimited)" style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1.2rem;">
-                <label style="display: flex; align-items: center; gap: 10px; font-size: 1.2rem;">
-                    <input type="checkbox" id="promo-active" checked> Active
-                </label>
-                <button class="header-btn" onclick="createPromoCode()" style="padding: 15px; font-size: 1.2rem;"><i class="fas fa-plus"></i> Create Promo</button>
-            </div>
-        </div>
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-list"></i> Promo Codes</h2>
-                <button class="header-btn" onclick="loadPromoCodes()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <div id="promos-list" class="promo-grid"><div class="loading-spinner"></div></div>
-        </div>
-    </div>
-
-    <!-- === SECTION 27: NOTIFICATIONS === -->
-    <div id="notifications" class="content-section">
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-paper-plane"></i> Send Notification</h2>
-            </div>
-            <div style="display: grid; gap: 20px;">
-                <input type="text" id="notif-title" placeholder="Title" style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px;">
-                <textarea id="notif-message" placeholder="Message" rows="4" style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px;"></textarea>
-                <input type="text" id="notif-target" placeholder="Target User ID (leave empty for all)" style="padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px;">
-                <label style="display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="notif-important"> Important Notification
-                </label>
-                <button class="header-btn" onclick="sendNotification()" style="padding: 15px;"><i class="fas fa-paper-plane"></i> Send</button>
-            </div>
-        </div>
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-history"></i> Notification History</h2>
-                <button class="header-btn" onclick="loadNotificationsHistory()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <div id="notifications-history" class="requests-list"><div class="loading-spinner"></div></div>
-        </div>
-    </div>
-
-    <!-- === SECTION 28: ANALYTICS === -->
-    <div id="analytics" class="content-section">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-users"></i></div>
-                <div class="stat-info">
-                    <h3>Total Users</h3>
-                    <p id="analytics-total-users">0</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-wallet"></i></div>
-                <div class="stat-info">
-                    <h3>Total Balance</h3>
-                    <p id="analytics-total-balance">₹0</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-coins"></i></div>
-                <div class="stat-info">
-                    <h3>Total Deposits</h3>
-                    <p id="analytics-total-deposits">₹0</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-minus-circle"></i></div>
-                <div class="stat-info">
-                    <h3>Total Withdrawals</h3>
-                    <p id="analytics-total-withdrawals">₹0</p>
-                </div>
-            </div>
-        </div>
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-chart-line"></i> Platform Statistics</h2>
-                <button class="header-btn" onclick="loadAnalytics()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <div id="analytics-content" style="padding: 20px; min-height: 200px;">
-                <div class="loading-spinner"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- === SECTION 29: SETTINGS === -->
-    <div id="settings" class="content-section">
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-cog"></i> Game Settings</h2>
-                <button class="header-btn" onclick="loadSettings()"><i class="fas fa-sync-alt"></i> Load</button>
-            </div>
-            <div style="display: grid; gap: 20px; max-width: 500px;">
-                <div>
-                    <label>Game Timer (seconds)</label>
-                    <input type="number" id="setting-timer" value="15" class="search-section" style="width: 100%;">
-                </div>
-                <div>
-                    <label>Result Delay (seconds)</label>
-                    <input type="number" id="setting-delay" value="3" class="search-section" style="width: 100%;">
-                </div>
-                <div>
-                    <label>Min Deposit (₹)</label>
-                    <input type="number" id="setting-min-deposit" value="10" class="search-section" style="width: 100%;">
-                </div>
-                <div>
-                    <label>Max Deposit (₹)</label>
-                    <input type="number" id="setting-max-deposit" value="100000" class="search-section" style="width: 100%;">
-                </div>
-                <div>
-                    <label>Min Withdrawal (₹)</label>
-                    <input type="number" id="setting-min-withdrawal" value="100" class="search-section" style="width: 100%;">
-                </div>
-                <div>
-                    <label>Max Withdrawal (₹)</label>
-                    <input type="number" id="setting-max-withdrawal" value="50000" class="search-section" style="width: 100%;">
-                </div>
-                <div>
-                    <label style="display: flex; align-items: center; gap: 10px;">
-                        <input type="checkbox" id="setting-maintenance"> Maintenance Mode
-                    </label>
-                </div>
-                <button class="header-btn" onclick="saveSettings()" style="padding: 15px;"><i class="fas fa-save"></i> Save Settings</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- === SECTION 30: TRANSACTIONS === -->
-    <div id="transactions" class="content-section">
-        <div class="section-card">
-            <div class="card-header">
-                <h2><i class="fas fa-exchange-alt"></i> Transaction History</h2>
-                <button class="header-btn" onclick="loadTransactions()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                    <button class="header-btn" onclick="filterByType('all')">All</button>
-                    <button class="header-btn" onclick="filterByType('deposit')">Deposits</button>
-                    <button class="header-btn" onclick="filterByType('withdrawal')">Withdrawals</button>
-                    <button class="header-btn" onclick="filterByType('win')">Wins</button>
-                    <button class="header-btn" onclick="filterByType('loss')">Losses</button>
-                    <button class="header-btn" onclick="filterByType('bonus')">Bonuses</button>
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <input type="date" id="date-from" class="search-section" style="flex: 1;">
-                    <input type="date" id="date-to" class="search-section" style="flex: 1;">
-                    <button class="header-btn" onclick="applyDateFilter()">Apply</button>
-                    <button class="header-btn" onclick="resetDateFilter()">Reset</button>
-                </div>
-            </div>
-            <div id="transactions-list" class="requests-list"><div class="loading-spinner"></div></div>
-            <div id="transactions-pagination" style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;"></div>
-        </div>
-    </div>
-</main>
-
-<!-- === SECTION 31: USER MODAL === -->
-<div class="modal-overlay" id="user-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-user-circle"></i> User Details</h3>
-            <button class="close-btn" onclick="closeUserModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="user-modal-content"></div>
-    </div>
+<div class="selection-toolbar" id="selectionToolbar">
+  <span id="selectionCount">0</span>
+  <div style="display:flex;gap:8px">
+    <button id="selectAllBtn">सब</button>
+    <button id="pinSelectedBtn">📌 पिन</button>
+    <button id="deleteSelectedBtn" style="background:#c62828">हटाएँ</button>
+    <button id="cancelSelectionBtn">रद्द</button>
+  </div>
 </div>
 
-<!-- === SECTION 32: CONFIRM MODAL === -->
-<div class="modal-overlay" id="confirm-modal">
-    <div class="modal-content" style="max-width: 400px;">
-        <div class="modal-header">
-            <h3><i class="fas fa-question-circle"></i> Confirm Action</h3>
-            <button class="close-btn" onclick="closeConfirmModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="confirm-modal-content" style="padding: 20px; text-align: center;">
-            <p id="confirm-message">Are you sure?</p>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="approve-btn" style="flex: 1;" onclick="confirmAction()">Yes</button>
-                <button class="reject-btn" style="flex: 1;" onclick="closeConfirmModal()">No</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ======================================================= -->
-<!-- === SECTION 33: SUPABASE SCRIPT === -->
-<!-- ======================================================= -->
 <script>
-    // ======================================================= -->
-    // === SECTION 34: SUPABASE CONFIGURATION === -->
-    // ======================================================= -->
-    console.log('🚀 Admin Panel Initializing...');
-    
-    const SUPABASE_URL = 'https://gvxvibreducyyalebhuz.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_DHVp7vwUJU0oA89rdJNgQQ_Mj2RJnV0';
-    
-    // Initialize Supabase
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    // ======================================================= -->
-    // === SECTION 35: GLOBAL VARIABLES === -->
-    // ======================================================= -->
-    let selectedUsers = new Set();
-    let currentType = 'all';
-    let currentPage = 1;
-    let pageSize = 20;
-    let dateFrom = null;
-    let dateTo = null;
-    let pendingAction = null;
-    let pendingData = null;
-    
-    // ======================================================= -->
-    // === SECTION 36: CONNECTION CHECK WITH DETAILED ERRORS === -->
-    // ======================================================= -->
-    async function checkConnection() {
-        const dot = document.getElementById('dot');
-        const text = document.getElementById('connectionText');
-        
-        try {
-            console.log('🔍 Checking Supabase connection...');
-            
-            // Try to get a simple query to test connection
-            const { data, error } = await supabase
-                .from('users')
-                .select('count', { count: 'exact', head: true });
-            
-            if (error) {
-                console.error('❌ Connection Error Details:', {
-                    message: error.message,
-                    code: error.code,
-                    details: error.details,
-                    hint: error.hint
-                });
-                
-                dot.style.background = '#DC3545';
-                dot.style.boxShadow = '0 0 20px #DC3545';
-                text.innerHTML = 'Disconnected';
-                text.style.color = '#ff6b6b';
-                
-                // Show detailed error toast
-                showToast(`❌ Connection Failed: ${error.message}`, 'error');
-                
-                // Log detailed error for debugging
-                if (error.code === 'PGRST116') {
-                    console.log('ℹ️ Table "users" might not exist. Please create the table first.');
-                } else if (error.code === '42P01') {
-                    console.log('ℹ️ Table does not exist. Run the SQL from Section 37.');
-                }
-                
-                return false;
-            }
-            
-            console.log('✅ Supabase Connected Successfully!');
-            dot.style.background = '#28A745';
-            dot.style.boxShadow = '0 0 20px #28A745';
-            text.innerHTML = 'Connected';
-            text.style.color = 'rgba(255,255,255,0.9)';
-            showToast('✅ Supabase Connected!', 'success');
-            return true;
-            
-        } catch (error) {
-            console.error('❌ Fatal Connection Error:', error);
-            dot.style.background = '#DC3545';
-            dot.style.boxShadow = '0 0 20px #DC3545';
-            text.innerHTML = 'Error';
-            text.style.color = '#ff6b6b';
-            showToast('❌ Fatal Error: ' + error.message, 'error');
-            return false;
-        }
+// ============== डेटा ==============
+let folders = [{id:'f1', name:'मुख्य'}];
+let notes = [];
+let currentFolderId = 'f1';
+let selectionMode = false;
+let selectedNotes = new Set();
+let selectedOrder = [];
+
+// ============== फंक्शन ==============
+function saveToLocal() {
+  localStorage.setItem('notes_folders', JSON.stringify(folders));
+  localStorage.setItem('notes_notes', JSON.stringify(notes));
+}
+
+function loadFromLocal() {
+  const savedFolders = localStorage.getItem('notes_folders');
+  const savedNotes = localStorage.getItem('notes_notes');
+  if(savedFolders) folders = JSON.parse(savedFolders);
+  if(savedNotes) notes = JSON.parse(savedNotes);
+  if(folders.length === 0) folders = [{id:'f1', name:'मुख्य'}];
+  if(!currentFolderId) currentFolderId = folders[0].id;
+  
+  // हर फोल्डर के लिए खाली नोट बनाओ
+  folders.forEach(folder => {
+    const emptyId = `empty_${folder.id}`;
+    if(!notes.find(n => n.id === emptyId)) {
+      notes.push({id: emptyId, folderId: folder.id, title: "", content: "", isEmpty: true});
     }
+  });
+  saveToLocal();
+}
 
-    // ======================================================= -->
-    // === SECTION 37: SQL TO CREATE TABLES (RUN IN SUPABASE SQL EDITOR) === -->
-    // ======================================================= -->
-    /*
-    -- Copy and run this SQL in your Supabase SQL Editor first:
+function showToast(msg) {
+  let old = document.querySelector('.toast');
+  if(old) old.remove();
+  let div = document.createElement('div');
+  div.className = 'toast';
+  div.innerText = msg;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 800);
+}
+
+async function copyText(text, btn) {
+  if(text && text.trim()) {
+    await navigator.clipboard.writeText(text);
+    let oldText = btn.innerText;
+    btn.innerText = '✓';
+    showToast('कॉपी हो गया!');
+    setTimeout(() => btn.innerText = oldText, 600);
+  }
+}
+
+function renderFolders() {
+  let container = document.getElementById('foldersList');
+  container.innerHTML = '';
+  folders.forEach(folder => {
+    let div = document.createElement('div');
+    div.className = `folder-item ${currentFolderId === folder.id ? 'active' : ''}`;
+    div.innerText = folder.name;
+    div.onclick = () => {
+      currentFolderId = folder.id;
+      fullRender();
+    };
+    container.appendChild(div);
+  });
+  
+  let addBtn = document.createElement('div');
+  addBtn.className = 'folder-item';
+  addBtn.innerText = '+ नया';
+  addBtn.onclick = () => {
+    let name = prompt('फोल्डर का नाम?');
+    if(name && name.trim()) {
+      folders.push({id: 'f_' + Date.now(), name: name.trim()});
+      currentFolderId = folders[folders.length-1].id;
+      saveToLocal();
+      fullRender();
+      showToast('फोल्डर बन गया');
+    }
+  };
+  container.appendChild(addBtn);
+}
+
+function renderNotes() {
+  let container = document.getElementById('notesListArea');
+  let folderNotes = notes.filter(n => n.folderId === currentFolderId);
+  
+  // सॉर्ट: पिन वाले ऊपर
+  folderNotes.sort((a,b) => {
+    if(a.isEmpty && !b.isEmpty) return -1;
+    if(!a.isEmpty && b.isEmpty) return 1;
+    if(a.pinned && !b.pinned) return -1;
+    if(!a.pinned && b.pinned) return 1;
+    return 0;
+  });
+  
+  let realNotes = folderNotes.filter(n => !n.isEmpty);
+  realNotes.forEach((n, i) => n.displayNumber = realNotes.length - i);
+  
+  container.innerHTML = '';
+  
+  folderNotes.forEach(note => {
+    let card = document.createElement('div');
+    let isEmpty = note.isEmpty;
     
-    CREATE TABLE users (
-        id SERIAL PRIMARY KEY,
-        user_id TEXT UNIQUE NOT NULL,
-        name TEXT,
-        email TEXT,
-        phone TEXT,
-        balance DECIMAL DEFAULT 11,
-        total_wins INTEGER DEFAULT 0,
-        games_played INTEGER DEFAULT 0,
-        status TEXT DEFAULT 'active',
-        bank_accounts JSONB DEFAULT '[]',
-        upis JSONB DEFAULT '[]',
-        notifications JSONB DEFAULT '[]',
-        telegram_id TEXT,
-        telegram_username TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-    );
-    
-    CREATE TABLE transactions (
-        id SERIAL PRIMARY KEY,
-        transaction_id TEXT UNIQUE NOT NULL,
-        user_id TEXT NOT NULL,
-        amount DECIMAL NOT NULL,
-        type TEXT NOT NULL,
-        status TEXT DEFAULT 'pending',
-        utr TEXT,
-        payment_method TEXT,
-        bank_details JSONB,
-        admin_note TEXT,
-        processed_by TEXT,
-        processed_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT NOW()
-    );
-    
-    CREATE TABLE promos (
-        id SERIAL PRIMARY KEY,
-        code TEXT UNIQUE NOT NULL,
-        amount DECIMAL NOT NULL,
-        usage_limit INTEGER,
-        used_count INTEGER DEFAULT 0,
-        is_active BOOLEAN DEFAULT true,
-        created_by TEXT,
-        expires_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT NOW()
-    );
-    
-    CREATE TABLE notifications (
-        id SERIAL PRIMARY KEY,
-        title TEXT NOT NULL,
-        message TEXT NOT NULL,
-        target_user_id TEXT,
-        is_important BOOLEAN DEFAULT false,
-        is_read BOOLEAN DEFAULT false,
-        sent_by TEXT,
-        sent_at TIMESTAMP DEFAULT NOW()
-    );
-    
-    CREATE TABLE admin_settings (
-        id INTEGER PRIMARY KEY DEFAULT 1,
-        game_timer INTEGER DEFAULT 15,
-        result_delay INTEGER DEFAULT 3,
-        min_deposit DECIMAL DEFAULT 10,
-        max_deposit DECIMAL DEFAULT 100000,
-        min_withdrawal DECIMAL DEFAULT 100,
-        max_withdrawal DECIMAL DEFAULT 50000,
-        maintenance_mode BOOLEAN DEFAULT false,
-        updated_at TIMESTAMP DEFAULT NOW()
-    );
-    */
-
-    // ======================================================= -->
-    // === SECTION 38: TOAST MESSAGES === -->
-    // ======================================================= -->
-    function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast-message toast-${type}`;
-        toast.innerHTML = message;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    // ======================================================= -->
-    // === SECTION 39: NAVIGATION === -->
-    // ======================================================= -->
-    function showSection(sectionId) {
-        document.querySelectorAll('.nav-btn-bottom').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('nav-' + sectionId)?.classList.add('active');
-        
-        document.querySelectorAll('.content-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.getElementById(sectionId)?.classList.add('active');
-        
-        // Load section data
-        switch(sectionId) {
-            case 'dashboard': loadDashboard(); break;
-            case 'users': loadUsers(); break;
-            case 'transactions': loadTransactions(); break;
-            case 'add-money': loadAddMoneyRequests(); break;
-            case 'withdrawals': loadWithdrawalRequests(); break;
-            case 'promos': loadPromoCodes(); break;
-            case 'notifications': loadNotificationsHistory(); break;
-            case 'analytics': loadAnalytics(); break;
-            case 'settings': loadSettings(); break;
+    if(isEmpty) {
+      let nextNum = realNotes.length + 1;
+      card.className = 'empty-card';
+      card.innerHTML = `
+        <div style="font-size:0.7rem;color:#666;margin-bottom:5px">#${nextNum}</div>
+        <div class="empty-card-header" contenteditable="true" id="title_${note.id}" data-placeholder="शीर्षक लिखें..."></div>
+        <textarea id="text_${note.id}" class="empty-text-input" placeholder="यहाँ नोट लिखें..."></textarea>
+        <button class="save-empty-btn" data-id="${note.id}">💾 सेव करें</button>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="copy-title-btn" data-id="${note.id}">📋 टाइटल कॉपी</button>
+          <button class="paste-title-btn" data-id="${note.id}">📌 टाइटल पेस्ट</button>
+          <button class="copy-textarea-btn" data-id="${note.id}">📄 टेक्स्ट कॉपी</button>
+        </div>
+      `;
+      
+      setTimeout(() => {
+        let titleDiv = document.getElementById(`title_${note.id}`);
+        if(titleDiv) {
+          titleDiv.onkeydown = (e) => { if(e.key === 'Enter') { e.preventDefault(); titleDiv.blur(); } };
         }
-    }
-
-    // ======================================================= -->
-    // === SECTION 40: DASHBOARD === -->
-    // ======================================================= -->
-    async function loadDashboard() {
-        try {
-            // Get total users count
-            const { count: totalUsers, error: usersError } = await supabase
-                .from('users')
-                .select('*', { count: 'exact', head: true });
-            
-            if (usersError) throw usersError;
-            
-            // Get total balance
-            const { data: balances, error: balanceError } = await supabase
-                .from('users')
-                .select('balance');
-            
-            if (balanceError) throw balanceError;
-            
-            const totalBalance = balances?.reduce((sum, user) => sum + (user.balance || 0), 0) || 0;
-            
-            // Get pending requests count
-            const { count: pendingAdd, error: addError } = await supabase
-                .from('transactions')
-                .select('*', { count: 'exact', head: true })
-                .eq('type', 'deposit')
-                .eq('status', 'pending');
-            
-            const { count: pendingWithdraw, error: withdrawError } = await supabase
-                .from('transactions')
-                .select('*', { count: 'exact', head: true })
-                .eq('type', 'withdrawal')
-                .eq('status', 'pending');
-            
-            const pendingTotal = (pendingAdd || 0) + (pendingWithdraw || 0);
-            
-            // Update UI
-            document.getElementById('total-users').textContent = totalUsers || 0;
-            document.getElementById('total-balance').textContent = '₹' + totalBalance.toLocaleString();
-            document.getElementById('pending-count').textContent = pendingTotal;
-            
-            // Load recent activity
-            await loadRecentActivity();
-            
-        } catch (error) {
-            console.error('Dashboard error:', error);
-            showToast('❌ Error loading dashboard', 'error');
+      }, 10);
+      
+    } else {
+      card.className = `note-item ${selectedNotes.has(note.id) ? 'selected' : ''}`;
+      let preview = note.content ? note.content.substring(0, 60) : '';
+      if(preview.length > 57) preview = preview.slice(0, 55) + '...';
+      
+      card.innerHTML = `
+        <div class="note-title">
+          <span class="note-number">#${note.displayNumber}</span>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(note.title || 'बिना शीर्षक')}</span>
+          ${note.pinned ? '📌' : ''}
+          <button class="copy-title-note" data-id="${note.id}" style="padding:2px 8px">C</button>
+        </div>
+        <div class="note-preview">${escapeHtml(preview)}</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="copy-content-note" data-id="${note.id}" style="padding:4px 10px">📋 कॉपी</button>
+        </div>
+      `;
+      
+      // लॉन्ग प्रेस सेलेक्शन के लिए
+      let pressTimer;
+      card.ontouchstart = (e) => {
+        if(!selectionMode) {
+          pressTimer = setTimeout(() => {
+            toggleSelectionMode();
+            selectNote(note.id, card);
+          }, 500);
         }
-    }
-
-    async function loadRecentActivity() {
-        try {
-            const { data, error } = await supabase
-                .from('transactions')
-                .select(`
-                    *,
-                    users!inner(name)
-                `)
-                .order('created_at', { ascending: false })
-                .limit(10);
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('recent-activity');
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px;">No recent activity</div>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(tx => {
-                const date = new Date(tx.created_at).toLocaleString();
-                const userName = tx.users?.name || 'Unknown';
-                const amountClass = tx.type === 'deposit' || tx.type === 'win' || tx.type === 'bonus' ? '#28A745' : '#DC3545';
-                const sign = tx.type === 'deposit' || tx.type === 'win' || tx.type === 'bonus' ? '+' : '-';
-                
-                html += `
-                    <div class="request-item">
-                        <div>
-                            <span style="background: ${getTypeColor(tx.type)}; color: white; padding: 3px 10px; border-radius: 15px;">${tx.type?.toUpperCase()}</span>
-                            <div style="margin-top: 5px;"><strong>${userName}</strong></div>
-                            <div style="font-size: 0.8rem; color: #666;">${date}</div>
-                        </div>
-                        <div style="font-size: 1.2rem; font-weight: 700; color: ${amountClass}">
-                            ${sign}₹${tx.amount}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-        } catch (error) {
-            console.error('Recent activity error:', error);
-            document.getElementById('recent-activity').innerHTML = '<div style="text-align: center; padding: 40px; color: var(--danger-red);">❌ Error loading activity</div>';
-        }
-    }
-
-    // ======================================================= -->
-    // === SECTION 41: USERS === -->
-    // ======================================================= -->
-    async function loadUsers(page = 1) {
-        try {
-            const from = (page - 1) * pageSize;
-            const to = from + pageSize - 1;
-            
-            const { data, error, count } = await supabase
-                .from('users')
-                .select('*', { count: 'exact' })
-                .order('created_at', { ascending: false })
-                .range(from, to);
-            
-            if (error) throw error;
-            
-            const usersList = document.getElementById('users-list');
-            
-            if (!data || data.length === 0) {
-                usersList.innerHTML = '<div style="text-align: center; padding: 40px;">No users found</div>';
-                return;
-            }
-            
-            let totalBalance = 0;
-            let html = '';
-            
-            data.forEach(user => {
-                totalBalance += user.balance || 0;
-                const statusClass = user.status === 'active' ? 'status-active' : 
-                                   user.status === 'blocked' ? 'status-blocked' : 'status-deleted';
-                
-                html += `
-                    <div class="user-item" data-user-id="${user.user_id}">
-                        <input type="checkbox" class="user-checkbox" onchange="toggleUser('${user.user_id}')" ${user.status === 'deleted' ? 'disabled' : ''}>
-                        <div class="user-avatar">${user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
-                        <div class="user-info">
-                            <div class="user-name">
-                                ${user.name || 'Unknown'}
-                                <span class="user-id">ID: ${user.user_id?.slice(0, 8) || 'N/A'}</span>
-                            </div>
-                            <div class="user-email">${user.email || 'No email'}</div>
-                        </div>
-                        <div class="user-balance">₹${user.balance || 0}</div>
-                        <div class="user-status ${statusClass}">${user.status || 'active'}</div>
-                        <div class="user-actions">
-                            <button class="action-btn view" onclick="viewUser('${user.user_id}')"><i class="fas fa-eye"></i> View</button>
-                            <button class="action-btn edit" onclick="editUser('${user.user_id}')"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="action-btn delete" onclick="deleteUser('${user.user_id}')"><i class="fas fa-trash"></i> Del</button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            usersList.innerHTML = html;
-            
-            // Update stats
-            document.getElementById('total-users').textContent = count || 0;
-            document.getElementById('total-balance').textContent = '₹' + totalBalance.toLocaleString();
-            document.getElementById('analytics-total-users').textContent = count || 0;
-            document.getElementById('analytics-total-balance').textContent = '₹' + totalBalance.toLocaleString();
-            
-            // Update pagination
-            updateUsersPagination(page, Math.ceil(count / pageSize));
-            
-        } catch (error) {
-            console.error('Load users error:', error);
-            showToast('❌ Error loading users: ' + error.message, 'error');
-        }
-    }
-
-    function updateUsersPagination(current, total) {
-        const pagination = document.getElementById('users-pagination');
-        if (!pagination) return;
-        
-        if (total <= 1) {
-            pagination.innerHTML = '';
-            return;
-        }
-        
-        let html = '';
-        for (let i = 1; i <= total; i++) {
-            html += `<button class="header-btn ${i === current ? 'active' : ''}" onclick="loadUsers(${i})">${i}</button>`;
-        }
-        pagination.innerHTML = html;
-    }
-
-    function toggleUser(userId) {
-        if (selectedUsers.has(userId)) {
-            selectedUsers.delete(userId);
+      };
+      card.ontouchend = () => clearTimeout(pressTimer);
+      card.ontouchmove = () => clearTimeout(pressTimer);
+      
+      card.onclick = (e) => {
+        if(e.target.closest('.copy-title-note') || e.target.closest('.copy-content-note')) return;
+        if(selectionMode) {
+          toggleNoteSelection(note.id, card);
         } else {
-            selectedUsers.add(userId);
+          openFullscreen(note);
         }
-        document.getElementById('selected-count').textContent = selectedUsers.size;
+      };
     }
-
-    function clearSelection() {
-        selectedUsers.clear();
-        document.getElementById('selected-count').textContent = 0;
-        document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = false);
-    }
-
-    async function viewUser(userId) {
-        try {
-            const { data: user, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('user_id', userId)
-                .single();
-            
-            if (error) throw error;
-            
-            // Get user transactions
-            const { data: transactions, error: txError } = await supabase
-                .from('transactions')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false })
-                .limit(10);
-            
-            const modalContent = document.getElementById('user-modal-content');
-            
-            modalContent.innerHTML = `
-                <div style="padding: 20px;">
-                    <p><strong>Name:</strong> ${user.name || 'N/A'}</p>
-                    <p><strong>Email:</strong> ${user.email || 'N/A'}</p>
-                    <p><strong>User ID:</strong> ${user.user_id}</p>
-                    <p><strong>Balance:</strong> ₹${user.balance || 0}</p>
-                    <p><strong>Status:</strong> <span class="status-${user.status || 'active'}">${user.status || 'active'}</span></p>
-                    <p><strong>Telegram:</strong> ${user.telegram_username || 'N/A'}</p>
-                    <p><strong>Joined:</strong> ${new Date(user.created_at).toLocaleString()}</p>
-                    
-                    <h4 style="margin: 20px 0 10px;">Bank Accounts</h4>
-                    ${user.bank_accounts?.length > 0 ? 
-                        user.bank_accounts.map(acc => `
-                            <div style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-                                <p><strong>${acc.bankName || 'Bank'}</strong></p>
-                                <p>Holder: ${acc.accountHolder}</p>
-                                <p>A/C: ****${acc.accountNumber?.slice(-4)}</p>
-                                <p>IFSC: ${acc.ifsc}</p>
-                            </div>
-                        `).join('') 
-                        : '<p>No bank accounts</p>'}
-                    
-                    <h4 style="margin: 20px 0 10px;">Recent Transactions</h4>
-                    ${transactions?.length > 0 ?
-                        transactions.map(tx => `
-                            <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee;">
-                                <span>${tx.type} - ${new Date(tx.created_at).toLocaleDateString()}</span>
-                                <span style="color: ${tx.type === 'deposit' || tx.type === 'win' || tx.type === 'bonus' ? '#28A745' : '#DC3545'}">
-                                    ${tx.type === 'deposit' || tx.type === 'win' || tx.type === 'bonus' ? '+' : '-'}₹${tx.amount}
-                                </span>
-                            </div>
-                        `).join('')
-                        : '<p>No transactions</p>'
-                    }
-                    
-                    <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <input type="number" id="new-balance" value="${user.balance || 0}" style="flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
-                        <button class="header-btn" onclick="updateUserBalance('${user.user_id}')">Update Balance</button>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('user-modal').classList.add('active');
-            
-        } catch (error) {
-            console.error('View user error:', error);
-            showToast('❌ Error loading user details', 'error');
-        }
-    }
-
-    function closeUserModal() {
-        document.getElementById('user-modal').classList.remove('active');
-    }
-
-    async function updateUserBalance(userId) {
-        const newBalance = parseFloat(document.getElementById('new-balance').value);
-        try {
-            const { error } = await supabase
-                .from('users')
-                .update({ 
-                    balance: newBalance,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('user_id', userId);
-            
-            if (error) throw error;
-            
-            showToast('✅ Balance updated!', 'success');
-            closeUserModal();
-            loadUsers();
-        } catch (error) {
-            console.error('Update balance error:', error);
-            showToast('❌ Error updating balance', 'error');
-        }
-    }
-
-    function editUser(userId) { viewUser(userId); }
-
-    async function deleteUser(userId) {
-        if (!confirm('Delete this user?')) return;
-        try {
-            const { error } = await supabase
-                .from('users')
-                .update({ 
-                    status: 'deleted', 
-                    balance: 0,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('user_id', userId);
-            
-            if (error) throw error;
-            
-            showToast('✅ User deleted', 'success');
-            loadUsers();
-        } catch (error) {
-            console.error('Delete user error:', error);
-            showToast('❌ Error deleting user', 'error');
-        }
-    }
-
-    function searchUsers() {
-        const searchTerm = document.getElementById('user-search').value.toLowerCase();
-        document.querySelectorAll('.user-item').forEach(item => {
-            const text = item.textContent.toLowerCase();
-            item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    
+    container.appendChild(card);
+  });
+  
+  // बटन के इवेंट
+  document.querySelectorAll('.save-empty-btn').forEach(btn => {
+    btn.onclick = () => {
+      let id = btn.getAttribute('data-id');
+      let titleDiv = document.getElementById(`title_${id}`);
+      let textarea = document.getElementById(`text_${id}`);
+      let title = titleDiv?.innerText.trim() || '';
+      let content = textarea?.value.trim() || '';
+      
+      if(content) {
+        let finalTitle = title || content.split('\n')[0].substring(0, 40) || 'नया नोट';
+        notes.push({
+          id: Date.now() + '_' + Math.random(),
+          folderId: currentFolderId,
+          title: finalTitle,
+          content: content,
+          pinned: false
         });
-    }
-
-    function exportUsers() {
-        // Implementation for exporting users to CSV
-        showToast('📊 Export feature coming soon!', 'info');
-    }
-
-    // ======================================================= -->
-    // === SECTION 42: BULK ACTIONS === -->
-    // ======================================================= -->
-    async function bulkDeleteUsers() {
-        if (selectedUsers.size === 0) {
-            showToast('❌ No users selected', 'error');
-            return;
+        if(titleDiv) titleDiv.innerText = '';
+        if(textarea) textarea.value = '';
+        saveToLocal();
+        renderNotes();
+        showToast('नोट सेव हो गया! ✅');
+      } else {
+        showToast('कुछ लिखो भाई! ✍️');
+      }
+    };
+  });
+  
+  document.querySelectorAll('.copy-title-note').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      let note = notes.find(n => n.id === btn.getAttribute('data-id'));
+      copyText(note?.title, btn);
+    };
+  });
+  
+  document.querySelectorAll('.copy-content-note').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      let note = notes.find(n => n.id === btn.getAttribute('data-id'));
+      copyText(note?.content, btn);
+    };
+  });
+  
+  document.querySelectorAll('.copy-title-btn').forEach(btn => {
+    btn.onclick = async () => {
+      let id = btn.getAttribute('data-id');
+      let titleDiv = document.getElementById(`title_${id}`);
+      copyText(titleDiv?.innerText, btn);
+    };
+  });
+  
+  document.querySelectorAll('.paste-title-btn').forEach(btn => {
+    btn.onclick = async () => {
+      let id = btn.getAttribute('data-id');
+      let titleDiv = document.getElementById(`title_${id}`);
+      try {
+        let text = await navigator.clipboard.readText();
+        if(titleDiv && text) {
+          titleDiv.innerText = text;
+          showToast('पेस्ट हो गया');
         }
-        
-        if (!confirm(`Delete ${selectedUsers.size} users?`)) return;
-        
-        try {
-            for (const userId of selectedUsers) {
-                await supabase
-                    .from('users')
-                    .update({ 
-                        status: 'deleted', 
-                        balance: 0,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('user_id', userId);
-            }
-            
-            showToast(`✅ Deleted ${selectedUsers.size} users`, 'success');
-            clearSelection();
-            loadUsers();
-        } catch (error) {
-            console.error('Bulk delete error:', error);
-            showToast('❌ Error deleting users', 'error');
-        }
-    }
+      } catch(e) { showToast('पहले कॉपी करो'); }
+    };
+  });
+  
+  document.querySelectorAll('.copy-textarea-btn').forEach(btn => {
+    btn.onclick = async () => {
+      let id = btn.getAttribute('data-id');
+      let textarea = document.getElementById(`text_${id}`);
+      copyText(textarea?.value, btn);
+    };
+  });
+}
 
-    async function bulkBlockUsers() {
-        if (selectedUsers.size === 0) return;
-        
-        try {
-            for (const userId of selectedUsers) {
-                await supabase
-                    .from('users')
-                    .update({ status: 'blocked' })
-                    .eq('user_id', userId);
-            }
-            
-            showToast(`✅ Blocked ${selectedUsers.size} users`, 'success');
-            clearSelection();
-            loadUsers();
-        } catch (error) {
-            console.error('Bulk block error:', error);
-        }
-    }
+function selectNote(id, element) {
+  if(!selectedNotes.has(id)) {
+    selectedNotes.add(id);
+    selectedOrder.push(id);
+    element.classList.add('selected');
+    updateSelectionCount();
+  }
+}
 
-    async function bulkUnblockUsers() {
-        if (selectedUsers.size === 0) return;
-        
-        try {
-            for (const userId of selectedUsers) {
-                await supabase
-                    .from('users')
-                    .update({ status: 'active' })
-                    .eq('user_id', userId);
-            }
-            
-            showToast(`✅ Unblocked ${selectedUsers.size} users`, 'success');
-            clearSelection();
-            loadUsers();
-        } catch (error) {
-            console.error('Bulk unblock error:', error);
-        }
-    }
+function toggleNoteSelection(id, element) {
+  if(selectedNotes.has(id)) {
+    selectedNotes.delete(id);
+    let idx = selectedOrder.indexOf(id);
+    if(idx > -1) selectedOrder.splice(idx, 1);
+    element.classList.remove('selected');
+  } else {
+    selectedNotes.add(id);
+    selectedOrder.push(id);
+    element.classList.add('selected');
+  }
+  updateSelectionCount();
+  if(selectedNotes.size === 0) toggleSelectionMode();
+}
 
-    async function bulkAddBalance() {
-        if (selectedUsers.size === 0) return;
-        
-        const amount = prompt('Enter amount to add to each user:', '100');
-        if (!amount) return;
-        
-        try {
-            for (const userId of selectedUsers) {
-                const { data: user } = await supabase
-                    .from('users')
-                    .select('balance')
-                    .eq('user_id', userId)
-                    .single();
-                
-                const newBalance = (user?.balance || 0) + parseInt(amount);
-                
-                await supabase
-                    .from('users')
-                    .update({ balance: newBalance })
-                    .eq('user_id', userId);
-            }
-            
-            showToast(`✅ Added ₹${amount} to ${selectedUsers.size} users`, 'success');
-            clearSelection();
-            loadUsers();
-        } catch (error) {
-            console.error('Bulk add balance error:', error);
-        }
-    }
+function toggleSelectionMode() {
+  selectionMode = !selectionMode;
+  if(selectionMode) {
+    document.getElementById('selectionToolbar').classList.add('show');
+  } else {
+    document.getElementById('selectionToolbar').classList.remove('show');
+    selectedNotes.clear();
+    selectedOrder = [];
+    document.querySelectorAll('.note-item').forEach(el => el.classList.remove('selected'));
+  }
+  updateSelectionCount();
+}
 
-    // ======================================================= -->
-    // === SECTION 43: ADD MONEY === -->
-    // ======================================================= -->
-    async function loadAddMoneyRequests() {
-        try {
-            const { data, error } = await supabase
-                .from('transactions')
-                .select(`
-                    *,
-                    users!inner(name)
-                `)
-                .eq('type', 'deposit')
-                .eq('status', 'pending')
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('add-money-requests');
-            document.getElementById('add-money-count').textContent = data?.length || 0;
-            document.getElementById('add-money-total').textContent = (data?.length || 0) + ' Pending';
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px;">No pending requests</div>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(tx => {
-                html += `
-                    <div class="request-item">
-                        <div class="request-info">
-                            <h4>${tx.users?.name || 'Unknown'}</h4>
-                            <p>Amount: ₹${tx.amount || 0}</p>
-                            <p>UTR: ${tx.utr || 'N/A'}</p>
-                            <p>Date: ${new Date(tx.created_at).toLocaleString()}</p>
-                        </div>
-                        <div class="request-amount">₹${tx.amount || 0}</div>
-                        <div class="request-actions">
-                            <button class="approve-btn" onclick="approveAddMoney(${tx.id})">✅ Approve</button>
-                            <button class="reject-btn" onclick="rejectAddMoney(${tx.id})">❌ Reject</button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Load add money error:', error);
-        }
-    }
+function updateSelectionCount() {
+  document.getElementById('selectionCount').innerText = selectedNotes.size;
+}
 
-    async function approveAddMoney(transactionId) {
-        try {
-            const { data: tx, error: fetchError } = await supabase
-                .from('transactions')
-                .select('*')
-                .eq('id', transactionId)
-                .single();
-            
-            if (fetchError) throw fetchError;
-            
-            // Update transaction status
-            const { error: updateError } = await supabase
-                .from('transactions')
-                .update({ 
-                    status: 'approved',
-                    processed_at: new Date().toISOString()
-                })
-                .eq('id', transactionId);
-            
-            if (updateError) throw updateError;
-            
-            // Update user balance
-            const { data: user } = await supabase
-                .from('users')
-                .select('balance')
-                .eq('user_id', tx.user_id)
-                .single();
-            
-            const newBalance = (user?.balance || 0) + tx.amount;
-            
-            await supabase
-                .from('users')
-                .update({ balance: newBalance })
-                .eq('user_id', tx.user_id);
-            
-            showToast(`✅ Approved ₹${tx.amount}`, 'success');
-            loadAddMoneyRequests();
-            loadDashboard();
-            
-        } catch (error) {
-            console.error('Approve error:', error);
-            showToast('❌ Error approving request', 'error');
-        }
+function openFullscreen(note) {
+  let modal = document.createElement('div');
+  modal.className = 'fullscreen-modal';
+  modal.innerHTML = `
+    <div class="fullscreen-header">
+      <input id="fsTitle" value="${escapeHtml(note.title)}" placeholder="शीर्षक">
+      <button id="fsClose" style="background:#c62828;padding:8px 16px">✕ बंद करें</button>
+    </div>
+    <div id="fsContent" class="fullscreen-content" contenteditable="true">${escapeHtml(note.content)}</div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button id="fsSave" style="background:#ffd966;color:#000;flex:1">💾 सेव करें (Ctrl+S)</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.body.style.overflow = 'hidden';
+  
+  let titleInput = document.getElementById('fsTitle');
+  let contentDiv = document.getElementById('fsContent');
+  
+  let save = () => {
+    note.title = titleInput.value.trim() || 'बिना शीर्षक';
+    note.content = contentDiv.innerText;
+    saveToLocal();
+    renderNotes();
+    modal.remove();
+    document.body.style.overflow = '';
+    showToast('सेव हो गया!');
+  };
+  
+  document.getElementById('fsSave').onclick = save;
+  document.getElementById('fsClose').onclick = () => {
+    modal.remove();
+    document.body.style.overflow = '';
+  };
+  
+  contentDiv.onkeydown = (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      save();
     }
+  };
+}
 
-    async function rejectAddMoney(transactionId) {
-        try {
-            const { error } = await supabase
-                .from('transactions')
-                .update({ status: 'rejected' })
-                .eq('id', transactionId);
-            
-            if (error) throw error;
-            
-            showToast('❌ Request rejected', 'success');
-            loadAddMoneyRequests();
-        } catch (error) {
-            console.error('Reject error:', error);
-        }
-    }
+function escapeHtml(str) {
+  if(!str) return '';
+  return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+}
 
-    async function loadAddMoneyHistory(filter = 'all') {
-        try {
-            let query = supabase
-                .from('transactions')
-                .select(`
-                    *,
-                    users!inner(name)
-                `)
-                .eq('type', 'deposit')
-                .order('created_at', { ascending: false })
-                .limit(50);
-            
-            if (filter !== 'all') {
-                query = query.eq('status', filter);
-            }
-            
-            const { data, error } = await query;
-            if (error) throw error;
-            
-            const container = document.getElementById('add-money-history');
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px;">No history found</div>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(tx => {
-                html += `
-                    <div class="request-item">
-                        <div class="request-info">
-                            <h4>${tx.users?.name || 'Unknown'}</h4>
-                            <p>Amount: ₹${tx.amount || 0}</p>
-                            <p>Status: <span style="color: ${tx.status === 'approved' ? '#28A745' : tx.status === 'rejected' ? '#DC3545' : '#FFA500'}">${tx.status}</span></p>
-                            <p>Date: ${new Date(tx.created_at).toLocaleString()}</p>
-                        </div>
-                        <div class="request-amount">₹${tx.amount || 0}</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Load add money history error:', error);
-        }
-    }
+function fullRender() {
+  renderFolders();
+  renderNotes();
+}
 
-    function refreshAddMoneyHistory() {
-        loadAddMoneyHistory('all');
-    }
-
-    // ======================================================= -->
-    // === SECTION 44: WITHDRAWALS === -->
-    // ======================================================= -->
-    async function loadWithdrawalRequests() {
-        try {
-            const { data, error } = await supabase
-                .from('transactions')
-                .select(`
-                    *,
-                    users!inner(name, bank_accounts)
-                `)
-                .eq('type', 'withdrawal')
-                .eq('status', 'pending')
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('withdrawal-requests');
-            document.getElementById('withdrawal-count').textContent = data?.length || 0;
-            document.getElementById('withdrawal-total').textContent = (data?.length || 0) + ' Pending';
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px;">No pending requests</div>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(tx => {
-                const bank = tx.bank_details || {};
-                const bankInfo = bank.bankName ? `${bank.bankName} (****${bank.accountNumber?.slice(-4)})` : 'N/A';
-                
-                html += `
-                    <div class="request-item">
-                        <div class="request-info">
-                            <h4>${tx.users?.name || 'Unknown'}</h4>
-                            <p>Amount: ₹${tx.amount || 0}</p>
-                            <p>Bank: ${bankInfo}</p>
-                            <p>Date: ${new Date(tx.created_at).toLocaleString()}</p>
-                        </div>
-                        <div class="request-amount">₹${tx.amount || 0}</div>
-                        <div class="request-actions">
-                            <button class="approve-btn" onclick="approveWithdrawal(${tx.id})">✅ Approve</button>
-                            <button class="reject-btn" onclick="rejectWithdrawal(${tx.id})">❌ Reject</button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Load withdrawals error:', error);
-        }
-    }
-
-    async function approveWithdrawal(transactionId) {
-        try {
-            const { error } = await supabase
-                .from('transactions')
-                .update({ 
-                    status: 'approved',
-                    processed_at: new Date().toISOString()
-                })
-                .eq('id', transactionId);
-            
-            if (error) throw error;
-            
-            showToast('✅ Withdrawal approved', 'success');
-            loadWithdrawalRequests();
-        } catch (error) {
-            console.error('Approve withdrawal error:', error);
-        }
-    }
-
-    async function rejectWithdrawal(transactionId) {
-        try {
-            const { data: tx, error: fetchError } = await supabase
-                .from('transactions')
-                .select('*')
-                .eq('id', transactionId)
-                .single();
-            
-            if (fetchError) throw fetchError;
-            
-            // Update transaction status
-            const { error: updateError } = await supabase
-                .from('transactions')
-                .update({ status: 'rejected' })
-                .eq('id', transactionId);
-            
-            if (updateError) throw updateError;
-            
-            // Refund user balance
-            const { data: user } = await supabase
-                .from('users')
-                .select('balance')
-                .eq('user_id', tx.user_id)
-                .single();
-            
-            const newBalance = (user?.balance || 0) + tx.amount;
-            
-            await supabase
-                .from('users')
-                .update({ balance: newBalance })
-                .eq('user_id', tx.user_id);
-            
-            showToast('❌ Withdrawal rejected, amount refunded', 'success');
-            loadWithdrawalRequests();
-        } catch (error) {
-            console.error('Reject withdrawal error:', error);
-        }
-    }
-
-    async function loadWithdrawalHistory(filter = 'all') {
-        try {
-            let query = supabase
-                .from('transactions')
-                .select(`
-                    *,
-                    users!inner(name)
-                `)
-                .eq('type', 'withdrawal')
-                .order('created_at', { ascending: false })
-                .limit(50);
-            
-            if (filter !== 'all') {
-                query = query.eq('status', filter);
-            }
-            
-            const { data, error } = await query;
-            if (error) throw error;
-            
-            const container = document.getElementById('withdrawal-history');
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px;">No history found</div>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(tx => {
-                html += `
-                    <div class="request-item">
-                        <div class="request-info">
-                            <h4>${tx.users?.name || 'Unknown'}</h4>
-                            <p>Amount: ₹${tx.amount || 0}</p>
-                            <p>Status: <span style="color: ${tx.status === 'approved' ? '#28A745' : tx.status === 'rejected' ? '#DC3545' : '#FFA500'}">${tx.status}</span></p>
-                            <p>Date: ${new Date(tx.created_at).toLocaleString()}</p>
-                        </div>
-                        <div class="request-amount">₹${tx.amount || 0}</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Load withdrawal history error:', error);
-        }
-    }
-
-    function refreshWithdrawalHistory() {
-        loadWithdrawalHistory('all');
-    }
-
-    // ======================================================= -->
-    // === SECTION 45: PROMOS === -->
-    // ======================================================= -->
-    async function createPromoCode() {
-        const code = document.getElementById('promo-code').value.toUpperCase();
-        const amount = parseInt(document.getElementById('promo-amount').value);
-        const usageLimit = document.getElementById('promo-limit').value ? parseInt(document.getElementById('promo-limit').value) : null;
-        const isActive = document.getElementById('promo-active').checked;
-        
-        if (!code || code.length < 3) {
-            showToast('❌ Enter valid promo code (min 3 characters)', 'error');
-            return;
-        }
-        
-        if (!amount || amount < 1) {
-            showToast('❌ Enter valid amount', 'error');
-            return;
-        }
-        
-        try {
-            const { error } = await supabase
-                .from('promos')
-                .insert({
-                    code,
-                    amount,
-                    usage_limit: usageLimit,
-                    is_active: isActive,
-                    used_count: 0
-                });
-            
-            if (error) throw error;
-            
-            showToast('✅ Promo code created!', 'success');
-            document.getElementById('promo-code').value = '';
-            document.getElementById('promo-amount').value = '100';
-            document.getElementById('promo-limit').value = '';
-            loadPromoCodes();
-        } catch (error) {
-            console.error('Create promo error:', error);
-            showToast('❌ Error creating promo code: ' + error.message, 'error');
-        }
-    }
-
-    async function loadPromoCodes() {
-        try {
-            const { data, error } = await supabase
-                .from('promos')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('promos-list');
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px;">No promo codes found</div>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(promo => {
-                html += `
-                    <div class="promo-card">
-                        <div class="promo-code">${promo.code}</div>
-                        <div class="promo-amount">₹${promo.amount}</div>
-                        <div class="promo-stats">
-                            <span><i class="fas fa-users"></i> Used: ${promo.used_count || 0}/${promo.usage_limit || '∞'}</span>
-                            <span><i class="fas fa-calendar"></i> ${new Date(promo.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="action-btn" style="background: ${promo.is_active ? '#DC3545' : '#28A745'}; color: white; flex: 1;" onclick="togglePromo(${promo.id}, ${!promo.is_active})">
-                                ${promo.is_active ? 'Deactivate' : 'Activate'}
-                            </button>
-                            <button class="action-btn delete" style="flex: 1;" onclick="deletePromo(${promo.id})">Delete</button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Load promos error:', error);
-        }
-    }
-
-    async function togglePromo(promoId, newStatus) {
-        try {
-            const { error } = await supabase
-                .from('promos')
-                .update({ is_active: newStatus })
-                .eq('id', promoId);
-            
-            if (error) throw error;
-            
-            showToast(`✅ Promo ${newStatus ? 'activated' : 'deactivated'}`, 'success');
-            loadPromoCodes();
-        } catch (error) {
-            console.error('Toggle promo error:', error);
-        }
-    }
-
-    async function deletePromo(promoId) {
-        if (!confirm('Delete this promo code?')) return;
-        
-        try {
-            const { error } = await supabase
-                .from('promos')
-                .delete()
-                .eq('id', promoId);
-            
-            if (error) throw error;
-            
-            showToast('✅ Promo deleted', 'success');
-            loadPromoCodes();
-        } catch (error) {
-            console.error('Delete promo error:', error);
-        }
-    }
-
-    // ======================================================= -->
-    // === SECTION 46: NOTIFICATIONS === -->
-    // ======================================================= -->
-    async function sendNotification() {
-        const title = document.getElementById('notif-title').value;
-        const message = document.getElementById('notif-message').value;
-        const target = document.getElementById('notif-target').value;
-        const isImportant = document.getElementById('notif-important').checked;
-        
-        if (!title || !message) {
-            showToast('❌ Enter title and message', 'error');
-            return;
-        }
-        
-        try {
-            const { error } = await supabase
-                .from('notifications')
-                .insert({
-                    title,
-                    message,
-                    target_user_id: target || null,
-                    is_important: isImportant,
-                    sent_at: new Date().toISOString()
-                });
-            
-            if (error) throw error;
-            
-            showToast('📢 Notification sent!', 'success');
-            document.getElementById('notif-title').value = '';
-            document.getElementById('notif-message').value = '';
-            document.getElementById('notif-target').value = '';
-            document.getElementById('notif-important').checked = false;
-            loadNotificationsHistory();
-        } catch (error) {
-            console.error('Send notification error:', error);
-            showToast('❌ Error sending notification', 'error');
-        }
-    }
-
-    async function loadNotificationsHistory() {
-        try {
-            const { data, error } = await supabase
-                .from('notifications')
-                .select('*')
-                .order('sent_at', { ascending: false })
-                .limit(20);
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('notifications-history');
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px;">No notifications sent</div>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(notif => {
-                const importantClass = notif.is_important ? 'badge-warning' : '';
-                html += `
-                    <div class="request-item">
-                        <div class="request-info">
-                            <h4>${notif.title} ${notif.is_important ? '🔴' : ''}</h4>
-                            <p>${notif.message}</p>
-                            <p style="font-size: 0.8rem; color: #666;">
-                                ${new Date(notif.sent_at).toLocaleString()}
-                                ${notif.target_user_id ? ` • To: ${notif.target_user_id}` : ' • To: All Users'}
-                            </p>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Load notifications error:', error);
-        }
-    }
-
-    // ======================================================= -->
-    // === SECTION 47: ANALYTICS === -->
-    // ======================================================= -->
-    async function loadAnalytics() {
-        try {
-            // Get total deposits and withdrawals
-            const { data: deposits, error: depError } = await supabase
-                .from('transactions')
-                .select('amount')
-                .eq('type', 'deposit')
-                .eq('status', 'approved');
-            
-            const { data: withdrawals, error: withError } = await supabase
-                .from('transactions')
-                .select('amount')
-                .eq('type', 'withdrawal')
-                .eq('status', 'approved');
-            
-            if (depError || withError) throw depError || withError;
-            
-            const totalDeposits = deposits?.reduce((sum, tx) => sum + tx.amount, 0) || 0;
-            const totalWithdrawals = withdrawals?.reduce((sum, tx) => sum + tx.amount, 0) || 0;
-            
-            document.getElementById('analytics-total-deposits').textContent = '₹' + totalDeposits.toLocaleString();
-            document.getElementById('analytics-total-withdrawals').textContent = '₹' + totalWithdrawals.toLocaleString();
-            
-            // Load game statistics
-            const container = document.getElementById('analytics-content');
-            container.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                    <div style="background: #e8f4fd; padding: 20px; border-radius: 10px;">
-                        <h4 style="margin-bottom: 15px;">Financial Summary</h4>
-                        <p>Total Deposits: ₹${totalDeposits.toLocaleString()}</p>
-                        <p>Total Withdrawals: ₹${totalWithdrawals.toLocaleString()}</p>
-                        <p>Net Balance: ₹${(totalDeposits - totalWithdrawals).toLocaleString()}</p>
-                    </div>
-                    <div style="background: #fff3cd; padding: 20px; border-radius: 10px;">
-                        <h4 style="margin-bottom: 15px;">Platform Health</h4>
-                        <p>Active Users: ${document.getElementById('total-users').textContent}</p>
-                        <p>Total Balance: ${document.getElementById('total-balance').textContent}</p>
-                        <p>Pending: ${document.getElementById('pending-count').textContent}</p>
-                    </div>
-                </div>
-            `;
-            
-        } catch (error) {
-            console.error('Analytics error:', error);
-        }
-    }
-
-    // ======================================================= -->
-    // === SECTION 48: SETTINGS === -->
-    // ======================================================= -->
-    async function loadSettings() {
-        try {
-            const { data, error } = await supabase
-                .from('admin_settings')
-                .select('*')
-                .eq('id', 1)
-                .single();
-            
-            if (error && error.code !== 'PGRST116') throw error;
-            
-            if (data) {
-                document.getElementById('setting-timer').value = data.game_timer || 15;
-                document.getElementById('setting-delay').value = data.result_delay || 3;
-                document.getElementById('setting-min-deposit').value = data.min_deposit || 10;
-                document.getElementById('setting-max-deposit').value = data.max_deposit || 100000;
-                document.getElementById('setting-min-withdrawal').value = data.min_withdrawal || 100;
-                document.getElementById('setting-max-withdrawal').value = data.max_withdrawal || 50000;
-                document.getElementById('setting-maintenance').checked = data.maintenance_mode || false;
-            }
-        } catch (error) {
-            console.error('Load settings error:', error);
-        }
-    }
-
-    async function saveSettings() {
-        const settings = {
-            id: 1,
-            game_timer: parseInt(document.getElementById('setting-timer').value),
-            result_delay: parseInt(document.getElementById('setting-delay').value),
-            min_deposit: parseInt(document.getElementById('setting-min-deposit').value),
-            max_deposit: parseInt(document.getElementById('setting-max-deposit').value),
-            min_withdrawal: parseInt(document.getElementById('setting-min-withdrawal').value),
-            max_withdrawal: parseInt(document.getElementById('setting-max-withdrawal').value),
-            maintenance_mode: document.getElementById('setting-maintenance').checked,
-            updated_at: new Date().toISOString()
-        };
-        
-        try {
-            const { error } = await supabase
-                .from('admin_settings')
-                .upsert(settings);
-            
-            if (error) throw error;
-            
-            showToast('✅ Settings saved!', 'success');
-        } catch (error) {
-            console.error('Save settings error:', error);
-            showToast('❌ Error saving settings', 'error');
-        }
-    }
-
-    // ======================================================= -->
-    // === SECTION 49: TRANSACTIONS === -->
-    // ======================================================= -->
-    function getTypeColor(type) {
-        const colors = {
-            'deposit': '#28A745',
-            'withdrawal': '#DC3545',
-            'win': '#FFD700',
-            'loss': '#FD7E14',
-            'bonus': '#17A2B8'
-        };
-        return colors[type] || '#6C757D';
-    }
-
-    function filterByType(type) {
-        currentType = type;
-        loadTransactions();
-    }
-
-    function applyDateFilter() {
-        dateFrom = document.getElementById('date-from').value;
-        dateTo = document.getElementById('date-to').value;
-        loadTransactions();
-    }
-
-    function resetDateFilter() {
-        document.getElementById('date-from').value = '';
-        document.getElementById('date-to').value = '';
-        dateFrom = null;
-        dateTo = null;
-        currentType = 'all';
-        loadTransactions();
-    }
-
-    async function loadTransactions(page = 1) {
-        try {
-            const from = (page - 1) * pageSize;
-            const to = from + pageSize - 1;
-            
-            let query = supabase
-                .from('transactions')
-                .select(`
-                    *,
-                    users!inner(name)
-                `, { count: 'exact' })
-                .order('created_at', { ascending: false })
-                .range(from, to);
-            
-            if (currentType !== 'all') {
-                query = query.eq('type', currentType);
-            }
-            
-            if (dateFrom) {
-                query = query.gte('created_at', new Date(dateFrom).toISOString());
-            }
-            
-            if (dateTo) {
-                const endDate = new Date(dateTo);
-                endDate.setHours(23, 59, 59, 999);
-                query = query.lte('created_at', endDate.toISOString());
-            }
-            
-            const { data, error, count } = await query;
-            if (error) throw error;
-            
-            const container = document.getElementById('transactions-list');
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 60px 20px;">No transactions found</div>';
-                return;
-            }
-            
-            let totalDeposits = 0, totalWithdrawals = 0;
-            let html = `<div style="padding: 15px; background: #e8f4fd; margin-bottom: 15px; border-radius: 8px;">
-                Showing ${data.length} of ${count} transactions
-            </div>`;
-            
-            data.forEach(tx => {
-                if (tx.type === 'deposit') totalDeposits += tx.amount || 0;
-                if (tx.type === 'withdrawal') totalWithdrawals += tx.amount || 0;
-                
-                const date = new Date(tx.created_at).toLocaleString();
-                const userName = tx.users?.name || 'Unknown';
-                const amountClass = tx.type === 'deposit' || tx.type === 'win' || tx.type === 'bonus' ? '#28A745' : '#DC3545';
-                const sign = tx.type === 'deposit' || tx.type === 'win' || tx.type === 'bonus' ? '+' : '-';
-                
-                html += `
-                    <div class="request-item">
-                        <div>
-                            <span style="background: ${getTypeColor(tx.type)}; color: white; padding: 3px 10px; border-radius: 15px;">${tx.type?.toUpperCase()}</span>
-                            <span style="font-size: 0.8rem; color: #666; margin-left: 10px;">${date}</span>
-                            <div style="font-weight: 600; margin-top: 5px;">${userName}</div>
-                            <div style="font-size: 0.8rem; color: #666;">Status: ${tx.status}</div>
-                        </div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: ${amountClass}">
-                            ${sign}₹${tx.amount || 0}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html = `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                    <div style="text-align: center; padding: 15px; background: #28A74520; border-left: 4px solid #28A745; border-radius: 8px;">
-                        <div style="color: #28A745;">Total Deposits (This Page)</div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #28A745;">₹${totalDeposits.toLocaleString()}</div>
-                    </div>
-                    <div style="text-align: center; padding: 15px; background: #DC354520; border-left: 4px solid #DC3545; border-radius: 8px;">
-                        <div style="color: #DC3545;">Total Withdrawals (This Page)</div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #DC3545;">₹${totalWithdrawals.toLocaleString()}</div>
-                    </div>
-                </div>
-            ` + html;
-            
-            container.innerHTML = html;
-            
-            // Update analytics
-            document.getElementById('analytics-total-deposits').textContent = '₹' + totalDeposits.toLocaleString();
-            document.getElementById('analytics-total-withdrawals').textContent = '₹' + totalWithdrawals.toLocaleString();
-            
-            // Update pagination
-            updateTransactionsPagination(page, Math.ceil(count / pageSize));
-            
-        } catch (error) {
-            console.error('Load transactions error:', error);
-            document.getElementById('transactions-list').innerHTML = '<div style="text-align: center; padding: 40px; color: var(--danger-red);">❌ Error loading transactions</div>';
-        }
-    }
-
-    function updateTransactionsPagination(current, total) {
-        const pagination = document.getElementById('transactions-pagination');
-        if (!pagination) return;
-        
-        if (total <= 1) {
-            pagination.innerHTML = '';
-            return;
-        }
-        
-        let html = '';
-        for (let i = 1; i <= total; i++) {
-            html += `<button class="header-btn ${i === current ? 'active' : ''}" onclick="loadTransactions(${i})">${i}</button>`;
-        }
-        pagination.innerHTML = html;
-    }
-
-    // ======================================================= -->
-    // === SECTION 50: CONFIRM MODAL === -->
-    // ======================================================= -->
-    function showConfirm(message, action, data) {
-        document.getElementById('confirm-message').textContent = message;
-        pendingAction = action;
-        pendingData = data;
-        document.getElementById('confirm-modal').classList.add('active');
-    }
-
-    function closeConfirmModal() {
-        document.getElementById('confirm-modal').classList.remove('active');
-        pendingAction = null;
-        pendingData = null;
-    }
-
-    async function confirmAction() {
-        if (pendingAction && pendingData) {
-            await pendingAction(pendingData);
-        }
-        closeConfirmModal();
-    }
-
-    // ======================================================= -->
-    // === SECTION 51: INITIALIZATION === -->
-    // ======================================================= -->
-    window.addEventListener('load', async function() {
-        console.log('🚀 Supabase Admin Panel Starting...');
-        
-        // Check connection first
-        await checkConnection();
-        
-        // Set dashboard as active
-        document.getElementById('nav-dashboard').classList.add('active');
-        document.getElementById('dashboard').classList.add('active');
-        
-        // Load all data
-        await loadDashboard();
-        
-        // Check connection every 30 seconds
-        setInterval(checkConnection, 30000);
+// सेलेक्शन टूलबार के बटन
+document.getElementById('selectAllBtn').onclick = () => {
+  let allNotes = document.querySelectorAll('.note-item');
+  if(selectedNotes.size === allNotes.length && allNotes.length > 0) {
+    selectedNotes.clear();
+    selectedOrder = [];
+    allNotes.forEach(n => n.classList.remove('selected'));
+  } else {
+    selectedOrder = [];
+    allNotes.forEach(card => {
+      let id = card.querySelector('.copy-title-note')?.getAttribute('data-id');
+      if(id && !selectedNotes.has(id)) {
+        selectedNotes.add(id);
+        selectedOrder.push(id);
+        card.classList.add('selected');
+      }
     });
+  }
+  updateSelectionCount();
+};
 
-    // Make functions globally available
-    window.showSection = showSection;
-    window.checkConnection = checkConnection;
-    window.toggleUser = toggleUser;
-    window.clearSelection = clearSelection;
-    window.viewUser = viewUser;
-    window.closeUserModal = closeUserModal;
-    window.updateUserBalance = updateUserBalance;
-    window.editUser = editUser;
-    window.deleteUser = deleteUser;
-    window.searchUsers = searchUsers;
-    window.exportUsers = exportUsers;
-    window.bulkDeleteUsers = bulkDeleteUsers;
-    window.bulkBlockUsers = bulkBlockUsers;
-    window.bulkUnblockUsers = bulkUnblockUsers;
-    window.bulkAddBalance = bulkAddBalance;
-    window.approveAddMoney = approveAddMoney;
-    window.rejectAddMoney = rejectAddMoney;
-    window.loadAddMoneyHistory = loadAddMoneyHistory;
-    window.refreshAddMoneyHistory = refreshAddMoneyHistory;
-    window.approveWithdrawal = approveWithdrawal;
-    window.rejectWithdrawal = rejectWithdrawal;
-    window.loadWithdrawalHistory = loadWithdrawalHistory;
-    window.refreshWithdrawalHistory = refreshWithdrawalHistory;
-    window.createPromoCode = createPromoCode;
-    window.togglePromo = togglePromo;
-    window.deletePromo = deletePromo;
-    window.sendNotification = sendNotification;
-    window.loadNotificationsHistory = loadNotificationsHistory;
-    window.loadAnalytics = loadAnalytics;
-    window.loadSettings = loadSettings;
-    window.saveSettings = saveSettings;
-    window.filterByType = filterByType;
-    window.applyDateFilter = applyDateFilter;
-    window.resetDateFilter = resetDateFilter;
-    window.loadTransactions = loadTransactions;
-    window.showConfirm = showConfirm;
-    window.closeConfirmModal = closeConfirmModal;
-    window.confirmAction = confirmAction;
+document.getElementById('pinSelectedBtn').onclick = () => {
+  if(selectedNotes.size === 0) return showToast('कोई नोट सेलेक्ट नहीं');
+  for(let id of selectedOrder) {
+    let note = notes.find(n => n.id === id);
+    if(note) note.pinned = !note.pinned;
+  }
+  saveToLocal();
+  renderNotes();
+  toggleSelectionMode();
+  showToast('पिन अपडेट हो गया');
+};
+
+document.getElementById('deleteSelectedBtn').onclick = () => {
+  if(selectedNotes.size === 0) return showToast('कोई नोट सेलेक्ट नहीं');
+  if(confirm(`${selectedNotes.size} नोट हटाएँ?`)) {
+    notes = notes.filter(n => !selectedNotes.has(n.id));
+    saveToLocal();
+    renderNotes();
+    toggleSelectionMode();
+    showToast('हटा दिया गया');
+  }
+};
+
+document.getElementById('cancelSelectionBtn').onclick = toggleSelectionMode;
+
+// ============== सर्विस वर्कर रजिस्टर ==============
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(() => {
+    console.log('SW रजिस्टर हो गया ⚡');
+  });
+}
+
+// ============== ऐप शुरू ==============
+loadFromLocal();
+fullRender();
 </script>
 </body>
 </html>
-
