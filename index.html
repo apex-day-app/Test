@@ -2,12 +2,13 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Error Book</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;scrollbar-width:none;-ms-overflow-style:none}
-*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
-html,body{scrollbar-width:none;-ms-overflow-style:none}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:-apple-system,'Segoe UI',Roboto,sans-serif}
+*{scrollbar-width:none!important;-ms-overflow-style:none!important}
+*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important;-webkit-appearance:none!important}
+*::-webkit-scrollbar-track,*::-webkit-scrollbar-track-piece,*::-webkit-scrollbar-thumb,*::-webkit-scrollbar-corner,*::-webkit-scrollbar-resizer,*::-webkit-scrollbar-button{display:none!important;width:0!important;height:0!important;background:transparent!important;-webkit-appearance:none!important}
 
 html{background-color:#0a0a0a;overscroll-behavior:none;height:100%;overflow:hidden}
 body{background:transparent!important;color:#e2e8f0;font-size:13px;overflow:hidden;height:100vh;position:relative;overscroll-behavior:none}
@@ -22,25 +23,13 @@ body{background:transparent!important;color:#e2e8f0;font-size:13px;overflow:hidd
   background-repeat:repeat;
 }
 
-/* === Inline FontAwesome base === */
 i.fa-solid, i.fa-regular, i.fa-brands, i.fa{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:1em;
-  height:1em;
-  line-height:1;
-  vertical-align:-0.125em;
-  fill:currentColor;
-  color:inherit;
-  font-style:normal;
-  flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:1em;height:1em;line-height:1;vertical-align:-0.125em;
+  fill:currentColor;color:inherit;font-style:normal;flex-shrink:0;
 }
 i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
-  width:1em;
-  height:1em;
-  display:block;
-  fill:currentColor;
+  width:1em;height:1em;display:block;fill:currentColor;
 }
 
 .top-area{position:fixed;top:0;left:0;right:0;width:100vw;background:#000;z-index:300;padding:0;margin:0;box-sizing:border-box}
@@ -64,7 +53,14 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
 .topstrip button[data-tab="settings"]{flex:0 0 38px;background:rgba(30,41,59,0.9);color:#94a3b8}
 .topstrip button[data-tab="settings"].active{background:#475569;color:#fff}
 
-.scroll-area{position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;padding:8px;padding-top:148px;z-index:1;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+.scroll-area{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;overflow-x:hidden;
+  padding:8px;padding-top:148px;z-index:1;
+  overscroll-behavior-y:contain;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.scroll-area::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 
 .card{background:#1e293b;border-radius:10px;padding:8px;margin-bottom:8px;border:1px solid #334155;box-shadow:0 4px 16px rgba(0,0,0,0.5)}
 .hidden{display:none!important}
@@ -88,50 +84,24 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
 .save-btn i{font-size:16px}
 
 .mistake, .folder{
-  position:relative;
-  background:transparent;
-  border-radius:10px;
-  overflow:hidden;
-  isolation:isolate;
-  z-index:1;
-  touch-action:pan-y;
-  margin-bottom:8px;
+  position:relative;background:transparent;border-radius:10px;overflow:hidden;
+  isolation:isolate;z-index:1;touch-action:pan-y;margin-bottom:8px;
 }
 .mistake{border:none;box-shadow:0 2px 10px rgba(0,0,0,0.4);}
 
 .swipe-action{
-  position:absolute;
-  top:0;right:0;bottom:0;
-  width:100%;
-  background:#dc2626;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  padding-right:22px;
-  pointer-events:none;
-  z-index:0;
+  position:absolute;top:0;right:0;bottom:0;width:100%;
+  background:#dc2626;display:flex;align-items:center;justify-content:flex-end;
+  padding-right:22px;pointer-events:none;z-index:0;
 }
-.swipe-action i{
-  color:#fff;
-  font-size:22px;
-  transform:scale(0.7);
-  opacity:0.9;
-  transition:transform .18s ease-out;
-}
+.swipe-action i{color:#fff;font-size:22px;transform:scale(0.7);opacity:0.9;transition:transform .18s ease-out}
 .mistake.swiping .swipe-action i,
-.folder.swiping .swipe-action i{
-  transform:scale(1);
-}
+.folder.swiping .swipe-action i{transform:scale(1)}
 
 .mistake .m-inner,
 .folder .f-inner{
-  position:relative;
-  z-index:1;
-  background:#1e293b;
-  border-radius:10px;
-  overflow:hidden;
-  transform:translateZ(0);
-  backface-visibility:hidden;
+  position:relative;z-index:1;background:#1e293b;border-radius:10px;overflow:hidden;
+  transform:translateZ(0);backface-visibility:hidden;
 }
 .mistake .m-inner{padding:8px;}
 
@@ -146,18 +116,11 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
   transition:height .35s cubic-bezier(.4,0,.2,1),
              margin .35s cubic-bezier(.4,0,.2,1),
              opacity .3s ease-out;
-  height:0!important;
-  min-height:0!important;
-  margin-top:0!important;
-  margin-bottom:0!important;
-  opacity:0;
-  pointer-events:none;
+  height:0!important;min-height:0!important;margin-top:0!important;margin-bottom:0!important;
+  opacity:0;pointer-events:none;
 }
 
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(6px);}
-  to{opacity:1;transform:translateY(0);}
-}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 .smooth-in{animation:fadeIn .4s cubic-bezier(.16,1,.3,1) both;}
 
 .ans-toggle-btn{width:100%;margin-top:6px;padding:0;background:#0f172a;border:1.5px solid #0f172a;border-radius:8px;color:#e2e8f0;font-size:11px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:space-between;gap:8px;letter-spacing:.3px;height:34px;min-height:34px;padding-left:10px;padding-right:10px;box-sizing:border-box;position:relative;z-index:2}
@@ -202,7 +165,8 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
 .fd-title{flex:1;font-size:13px;font-weight:800;color:#38bdf8;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .fd-title i{font-size:14px;flex-shrink:0}
 .fd-count{background:#0ea5e9;color:#fff;font-size:10px;padding:3px 10px;border-radius:20px;font-weight:800;flex-shrink:0;min-width:28px;text-align:center;height:22px;line-height:16px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center}
-.fd-body{position:absolute;top:100px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding:8px;padding-bottom:20px;box-sizing:border-box}
+.fd-body{position:absolute;top:100px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;padding:8px;padding-bottom:20px;box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none}
+.fd-body::-webkit-scrollbar{display:none!important;width:0!important}
 
 #storeView{position:fixed;inset:0;background:#0a0a0a;z-index:500;display:none;overflow:hidden;overscroll-behavior:contain}
 #storeView:not(.hidden){display:block}
@@ -210,15 +174,18 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
 .fd-back-store{width:34px;height:34px;min-width:34px;padding:0;font-size:14px;border-radius:8px;background:#1e293b;color:#e2e8f0;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .fd-title-store{flex:1;font-size:13px;font-weight:800;color:#38bdf8;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .store-count-badge{background:#0ea5e9;color:#fff;font-size:10px;padding:3px 10px;border-radius:20px;font-weight:800;flex-shrink:0;min-width:28px;text-align:center;height:22px;line-height:16px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center}
-#storeList{position:absolute;top:100px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding:8px;padding-bottom:20px;box-sizing:border-box}
+#storeList{position:absolute;top:100px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;padding:8px;padding-bottom:20px;box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none}
+#storeList::-webkit-scrollbar{display:none!important;width:0!important}
 
-#backupPanel{position:fixed;inset:0;background:#0a0a0a;z-index:600;display:flex;flex-direction:column;padding:8px;padding-top:154px;overflow-y:auto}
+#backupPanel{position:fixed;inset:0;background:#0a0a0a;z-index:600;display:flex;flex-direction:column;padding:8px;padding-top:154px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+#backupPanel::-webkit-scrollbar{display:none!important;width:0!important}
 #backupPanel.hidden{display:none!important}
 .bp-header{position:fixed;top:96px;left:8px;right:8px;display:flex;align-items:center;gap:8px;padding:8px;background:#0f172a;border-radius:10px;z-index:610;border:1px solid #334155;box-shadow:0 4px 16px rgba(0,0,0,0.6)}
 .bp-back{width:36px;height:36px;padding:0;font-size:15px;border-radius:9px;background:#475569;color:#fff;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .bp-title{flex:1;font-size:13px;font-weight:800;color:#38bdf8;display:flex;align-items:center;gap:6px}
 .bp-title i{color:#0ea5e9}
-.bp-textarea{width:100%;min-height:280px;max-height:55vh;background:#0f172a;color:#e2e8f0;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:11px;font-family:'Courier New',monospace;line-height:1.5;resize:vertical;outline:none;white-space:pre;overflow:auto;box-sizing:border-box;margin-top:60px}
+.bp-textarea{width:100%;min-height:280px;max-height:55vh;background:#0f172a;color:#e2e8f0;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:11px;font-family:'Courier New',monospace;line-height:1.5;resize:vertical;outline:none;white-space:pre;overflow:auto;box-sizing:border-box;margin-top:60px;scrollbar-width:none;-ms-overflow-style:none}
+.bp-textarea::-webkit-scrollbar{display:none!important;width:0!important}
 .bp-textarea:focus{border-color:#0ea5e9;box-shadow:0 0 0 2px rgba(14,165,233,0.2)}
 .bp-textarea[readonly]{opacity:0.9;cursor:default}
 .bp-icons{display:flex;justify-content:center;align-items:center;gap:30px;margin-top:22px;padding:18px 0;flex-wrap:wrap}
@@ -320,7 +287,6 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
 </head>
 <body>
 
-<!-- ===== Inline FontAwesome SVG Sprite (offline) ===== -->
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
   <defs>
     <symbol id="fa-sun" viewBox="0 0 512 512"><path d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z"/></symbol>
@@ -545,11 +511,9 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
 <div id="toast" class="toast"></div>
 
 <script>
-/* ===== Inline FontAwesome — auto-replace <i class="fa-solid fa-X"> with SVG ===== */
 (function autoReplaceFA(){
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const XLINK = 'http://www.w3.org/1999/xlink';
-
   function buildSvg(iconId){
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('aria-hidden', 'true');
@@ -560,7 +524,6 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
     svg.appendChild(use);
     return svg;
   }
-
   function process(root){
     if(!root || !root.querySelectorAll) return;
     const icons = root.querySelectorAll('i.fa-solid, i.fa-regular, i.fa-brands, i.fa');
@@ -576,7 +539,18 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
       icon.dataset.faReplaced = '1';
     });
   }
-
+  window.__faReplaceOne = function(icon){
+    if(!icon) return;
+    icon.dataset.faReplaced = '0';
+    const classes = icon.className.split(/\s+/);
+    const nameCls = classes.find(function(c){ return c.startsWith('fa-') && c !== 'fa-solid' && c !== 'fa-regular' && c !== 'fa-brands'; });
+    if(!nameCls) return;
+    const symbol = document.getElementById(nameCls);
+    if(!symbol) return;
+    icon.innerHTML = '';
+    icon.appendChild(buildSvg(nameCls));
+    icon.dataset.faReplaced = '1';
+  };
   function init(){
     process(document.body);
     const observer = new MutationObserver(function(mutations){
@@ -585,23 +559,16 @@ i.fa-solid > svg, i.fa-regular > svg, i.fa-brands > svg, i.fa > svg{
           if(node.nodeType !== 1) return;
           if(node.matches && node.matches('i.fa-solid, i.fa-regular, i.fa-brands, i.fa')){
             process(node.parentNode);
-          } else {
-            process(node);
-          }
+          } else { process(node); }
         });
       });
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
 })();
 
-/* ================= STATE ================= */
 let store = { today:[], weekly:[], monthly:[], store:[], lastDayCheck:"" };
 try { const saved = JSON.parse(localStorage.getItem('mockStore') || 'null'); if (saved && typeof saved === 'object') store = Object.assign(store, saved); } catch(e){}
 if(!Array.isArray(store.today)) store.today = [];
@@ -611,7 +578,6 @@ if(!Array.isArray(store.store)) store.store = [];
 if(!store.lastDayCheck) store.lastDayCheck = "";
 function saveStore(){ localStorage.setItem('mockStore', JSON.stringify(store)); }
 
-/* ================= LAYOUT ================= */
 function setScrollPadding(){
   const topArea = document.querySelector('.top-area');
   const scrollArea = document.querySelector('.scroll-area');
@@ -622,7 +588,6 @@ window.addEventListener('resize', setScrollPadding);
 window.addEventListener('orientationchange', setScrollPadding);
 setTimeout(setScrollPadding, 60);
 
-/* ================= DATE HELPERS ================= */
 function ymd(d){ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`; }
 function todayKey(){ return ymd(new Date()); }
 function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
@@ -660,7 +625,6 @@ function buildDateGroups(items){
 function getSortedList(items){ return [...items].sort((a,b) => new Date(b.date) - new Date(a.date)); }
 function hasAnyImage(m){ return !!(m && (m.qImage || m.myImage || m.cImage)); }
 
-/* ================= TEMP IMAGE HOLDERS ================= */
 let pImgQ=null, pImgMy=null, pImgC=null;
 let cropTarget=null;
 let cBox={x:0,y:0,w:200,h:150};
@@ -671,10 +635,8 @@ let rotatingBox = false, rotateStartAngle = 0, rotateStartRotation = 0;
 let boxCenter = { x: 0, y: 0 };
 let backupMode = null;
 
-/* ================= TOAST ================= */
 function toast(m,err){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast',1800)}
 
-/* ================= TABS ================= */
 function showTab(n){
   ['all','weekly','monthly','settings'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('hidden', t!==n);
@@ -694,7 +656,6 @@ function showTab(n){
   setScrollPadding();
 }
 
-/* ================= BACKUP ================= */
 function openBackup(mode){
   backupMode = mode;
   const panel = document.getElementById('backupPanel');
@@ -753,7 +714,6 @@ function applyImport(txt){
   }catch(e){ toast('JSON galat hai', 1); }
 }
 
-/* ================= CAMERA ================= */
 let camStream = null, camFacing = 'environment', camTarget = null, camReady = false;
 let camTrack = null, camCapabilities = null;
 let currentZoom = 1, flashOn = false, upgradingToHD = false;
@@ -868,7 +828,6 @@ function captureViaCanvas(){
 }
 function blobToDataURL(blob){ return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(blob); }); }
 
-/* ================= GALLERY ================= */
 function pickFromGallery(target){ cropTarget = target; const inp = document.getElementById('inputGallery'); inp.value = ''; setTimeout(() => inp.click(), 60); }
 function handleGalleryInput(e){
   const files = e.target.files; if(!files || !files.length) return;
@@ -883,7 +842,6 @@ function handleGalleryInput(e){
 }
 document.getElementById('inputGallery').addEventListener('change', handleGalleryInput);
 
-/* ================= CROP ================= */
 function initCrop(){
   cropBoxRotation = 0; cropImgRotation = 0;
   document.getElementById('cropImg').style.cssText = '';
@@ -1040,7 +998,6 @@ function selectFullImage(){
   toast('Full photo selected');
 }
 
-/* ================= ARCHIVE / FOLDERS ================= */
 function getCurrentWeekFolder(){
   const now = new Date(); const ws = weekStart(now); const we = new Date(ws); we.setDate(we.getDate() + 6);
   const wsKey = ymd(ws), weKey = ymd(we);
@@ -1070,10 +1027,8 @@ function getCurrentMonthFolder(){
 function autoArchive(){
   const now = new Date(), today = todayKey();
   if (store.lastDayCheck === today) return;
-
   getCurrentWeekFolder();
   getCurrentMonthFolder();
-
   if (store.today.length > 0) {
     const wf = getCurrentWeekFolder(), mf = getCurrentMonthFolder();
     store.today.forEach(it => {
@@ -1086,7 +1041,6 @@ function autoArchive(){
     });
     store.today = [];
   }
-
   if (now.getDate() === 1) {
     const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1), prevKey = monthKey(prevMonth);
     const prevWeeks = store.weekly.filter(w => monthKey(new Date(w.weekStart)) === prevKey);
@@ -1103,17 +1057,14 @@ function autoArchive(){
       mf.weeks.sort((a,b) => a.weekStart.localeCompare(b.weekStart));
     }
   }
-
   store.lastDayCheck = today;
   saveStore();
 }
 
-/* ================= SAVE MISTAKE ================= */
 function saveMistake(){
   if(!pImgQ && !pImgMy && !pImgC){ toast('Add at least one photo',1); return; }
   const newItem = { id: Date.now() + Math.random(), qImage: pImgQ, myImage: pImgMy, cImage: pImgC, date: new Date().toISOString() };
   store.today.push(newItem);
-
   const wf = getCurrentWeekFolder(); wf.items.push(newItem);
   const mf = getCurrentMonthFolder(); mf.items.push(newItem);
   const mwf = mf.weeks.find(w => w.weekStart === wf.weekStart);
@@ -1126,7 +1077,6 @@ function saveMistake(){
   saveStore(); clearForm(); toast('Saved'); renderAll();
 }
 
-/* ================= CARD RENDER ================= */
 let cardRenderCounter = 0;
 function mistakeCard(m, listKeyName, indexInList){
   const hasAns = m.myImage || m.cImage;
@@ -1134,10 +1084,8 @@ function mistakeCard(m, listKeyName, indexInList){
   const listKey = (listKeyName || 'all') + '|' + (indexInList != null ? indexInList : '');
   const qIdx = (indexInList != null) ? indexInList : 0;
   const qnum = (indexInList != null) ? (indexInList + 1) : '?';
-
   const myPhotoIdx = m.qImage ? 1 : 0;
   const cPhotoIdx = (m.qImage ? 1 : 0) + (m.myImage ? 1 : 0);
-
   return `
     <div class="mistake smooth-in" data-mistake-id="${m.id}">
       <div class="swipe-action"><i class="fa-solid fa-trash"></i></div>
@@ -1164,12 +1112,9 @@ function toggleAns(uid, btn){
   if(!icon || !span) return;
   if(showing){ icon.classList.remove('fa-chevron-down'); icon.classList.add('fa-chevron-up'); span.textContent = 'HIDE ANSWER'; }
   else { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); span.textContent = 'SHOW ANSWER'; }
-  // re-run FA replacement for this icon
-  if(icon.dataset){ icon.dataset.faReplaced = '0'; }
   if(window.__faReplaceOne) window.__faReplaceOne(icon);
 }
 
-/* ================= FOLDER DETAIL ================= */
 function openFolderDetail(type, key, preserveScroll){
   currentFolder = {type, key};
   const fd = document.getElementById('folderDetail');
@@ -1200,7 +1145,6 @@ function openFolderDetail(type, key, preserveScroll){
 }
 function closeFolderDetail(){ document.getElementById('folderDetail').classList.remove('show'); currentFolder = null; }
 
-/* ================= FULLSCREEN VIEWER ================= */
 let fsQuestions = [], fsQIndex = 0, fsIndex = 0;
 let fsScale = 1, fsTx = 0, fsTy = 0;
 let fsPinching = false, fsPinchStartDist = 0, fsPinchStartScale = 1, fsPinchStartTx = 0, fsPinchStartTy = 0, fsPinchMidX = 0, fsPinchMidY = 0;
@@ -1220,7 +1164,6 @@ function buildQuestionsFromList(sourceList){
     ].filter(Boolean)
   })).filter(q => q.images.length > 0);
 }
-
 function openFsFromCard(listKey, questionIdx, photoIndex){
   const tab = listKey.split('|')[0];
   let sourceList = [];
@@ -1234,7 +1177,6 @@ function openFsFromCard(listKey, questionIdx, photoIndex){
       else if(currentFolder.type === 'monthly'){ const m = store.monthly[currentFolder.key]; if(m) sourceList = (m.items && m.items.length) ? m.items : m.weeks.flatMap(w => w.items); }
     }
   } else sourceList = store.today || [];
-
   const questions = buildQuestionsFromList(sourceList);
   const qIdx = Math.max(0, Math.min(questionIdx || 0, questions.length - 1));
   openFsFromQuestions(questions, qIdx, photoIndex || 0);
@@ -1346,7 +1288,6 @@ function fsTouchDist(t1, t2){ const dx=t1.clientX-t2.clientX,dy=t1.clientY-t2.cl
   });
 })();
 
-/* ================= RENDER LISTS ================= */
 function renderAll(){
   const el=document.getElementById('allList');
   const list = getSortedList(store.today).filter(hasAnyImage);
@@ -1466,9 +1407,6 @@ function rerenderAll(){
   updateStoreCount();
 }
 
-/* ============================================================
-   SWIPE-TO-DELETE  —  Clean, professional, iOS-style
-   ============================================================ */
 const SWIPE_DEAD = 5;
 const COMMIT_RATIO = 0.42;
 const COMMIT_VELOCITY = 0.5;
@@ -1481,38 +1419,22 @@ function getCardWidth(el){ return el.offsetWidth || 300; }
 function handleTouchStart(e){
   const target = e.target;
   if(target.closest('button')) return;
-
   const card = target.closest('.mistake');
   const folder = target.closest('.folder');
   if(!card && !folder) return;
-
   const touch = e.touches[0];
   const now = Date.now();
-
   if(card){
-    swipeCard = {
-      el: card, width: getCardWidth(card),
-      startX: touch.clientX, startY: touch.clientY,
-      dx: 0, dy: 0, dir: null,
-      startTime: now, lastTime: now, lastX: touch.clientX,
-      velocity: 0, raf: null
-    };
+    swipeCard = { el: card, width: getCardWidth(card), startX: touch.clientX, startY: touch.clientY, dx: 0, dy: 0, dir: null, startTime: now, lastTime: now, lastX: touch.clientX, velocity: 0, raf: null };
     card.style.transition = 'none';
     card.style.touchAction = 'none';
   }
   if(folder){
-    swipeFolder = {
-      el: folder, width: getCardWidth(folder),
-      startX: touch.clientX, startY: touch.clientY,
-      dx: 0, dy: 0, dir: null,
-      startTime: now, lastTime: now, lastX: touch.clientX,
-      velocity: 0, raf: null
-    };
+    swipeFolder = { el: folder, width: getCardWidth(folder), startX: touch.clientX, startY: touch.clientY, dx: 0, dy: 0, dir: null, startTime: now, lastTime: now, lastX: touch.clientX, velocity: 0, raf: null };
     folder.style.transition = 'none';
     folder.style.touchAction = 'none';
   }
 }
-
 function updateSwipe(state, touch, now){
   state.dx = touch.clientX - state.startX;
   state.dy = touch.clientY - state.startY;
@@ -1521,7 +1443,6 @@ function updateSwipe(state, touch, now){
   state.velocity = state.velocity * 0.7 + instV * 0.3;
   state.lastTime = now;
   state.lastX = touch.clientX;
-
   if(!state.dir){
     if(Math.abs(state.dx) < SWIPE_DEAD && Math.abs(state.dy) < SWIPE_DEAD) return false;
     state.dir = Math.abs(state.dx) > Math.abs(state.dy) ? 'h' : 'v';
@@ -1531,19 +1452,15 @@ function updateSwipe(state, touch, now){
   }
   return state.dir === 'h';
 }
-
 function handleTouchMove(e){
   const touch = e.touches[0];
   const now = Date.now();
-
   if(swipeCard){
     if(updateSwipe(swipeCard, touch, now)){
       const x = Math.min(0, swipeCard.dx);
       const el = swipeCard.el;
       if(swipeCard.raf) cancelAnimationFrame(swipeCard.raf);
-      swipeCard.raf = requestAnimationFrame(() => {
-        const inner = el.querySelector('.m-inner'); if(inner) inner.style.transform = `translate3d(${x}px,0,0)`;
-      });
+      swipeCard.raf = requestAnimationFrame(() => { const inner = el.querySelector('.m-inner'); if(inner) inner.style.transform = `translate3d(${x}px,0,0)`; });
       e.preventDefault();
     }
   }
@@ -1552,44 +1469,27 @@ function handleTouchMove(e){
       const x = Math.min(0, swipeFolder.dx);
       const el = swipeFolder.el;
       if(swipeFolder.raf) cancelAnimationFrame(swipeFolder.raf);
-      swipeFolder.raf = requestAnimationFrame(() => {
-        const inner = el.querySelector('.f-inner'); if(inner) inner.style.transform = `translate3d(${x}px,0,0)`;
-      });
+      swipeFolder.raf = requestAnimationFrame(() => { const inner = el.querySelector('.f-inner'); if(inner) inner.style.transform = `translate3d(${x}px,0,0)`; });
       e.preventDefault();
     }
   }
 }
-
 function commitDelete(container, inner, currentX, velocity, onDone){
   const width = getCardWidth(container);
   const speed = Math.max(0.4, Math.min(3, Math.abs(velocity)));
   let dur = Math.max(220, Math.min(420, 320 / speed + 180));
-
   inner.style.transition = 'none';
   inner.style.transform = `translate3d(${currentX}px,0,0)`;
   void inner.offsetWidth;
-
   inner.style.transition = `transform ${dur}ms cubic-bezier(.4,0,.2,1)`;
   inner.style.transform = `translate3d(${-width}px,0,0)`;
-
-  setTimeout(() => {
-    container.classList.add('collapsing');
-    setTimeout(() => { if(typeof onDone === 'function') onDone(); }, 350);
-  }, dur);
+  setTimeout(() => { container.classList.add('collapsing'); setTimeout(() => { if(typeof onDone === 'function') onDone(); }, 350); }, dur);
 }
-
 function snapBack(container, inner){
   inner.style.transition = `transform ${SNAP_BACK_MS}ms cubic-bezier(.2,.8,.2,1)`;
   inner.style.transform = 'translate3d(0,0,0)';
-  setTimeout(() => {
-    container.classList.remove('swiping');
-    container.style.touchAction = 'pan-y';
-    container.style.willChange = 'auto';
-    inner.style.transition = '';
-    inner.style.transform = '';
-  }, SNAP_BACK_MS);
+  setTimeout(() => { container.classList.remove('swiping'); container.style.touchAction = 'pan-y'; container.style.willChange = 'auto'; inner.style.transition = ''; inner.style.transform = ''; }, SNAP_BACK_MS);
 }
-
 function handleTouchEnd(){
   if(swipeCard){
     const s = swipeCard;
@@ -1598,16 +1498,10 @@ function handleTouchEnd(){
     if(s.dir === 'h'){
       const inner = s.el.querySelector('.m-inner');
       const committed = Math.abs(s.dx) > s.width * COMMIT_RATIO || s.velocity < -COMMIT_VELOCITY;
-      if(committed){
-        const qid = s.el.dataset.mistakeId;
-        commitDelete(s.el, inner, s.dx, s.velocity, () => { if(qid) performDelete(qid); });
-      } else { snapBack(s.el, inner); }
-    } else {
-      s.el.style.touchAction = 'pan-y';
-      s.el.style.willChange = 'auto';
-    }
+      if(committed){ const qid = s.el.dataset.mistakeId; commitDelete(s.el, inner, s.dx, s.velocity, () => { if(qid) performDelete(qid); }); }
+      else { snapBack(s.el, inner); }
+    } else { s.el.style.touchAction = 'pan-y'; s.el.style.willChange = 'auto'; }
   }
-
   if(swipeFolder){
     const s = swipeFolder;
     if(s.raf) cancelAnimationFrame(s.raf);
@@ -1615,36 +1509,59 @@ function handleTouchEnd(){
     if(s.dir === 'h'){
       const inner = s.el.querySelector('.f-inner');
       const isLocked = s.el.dataset.folderLocked === '1';
-      if(isLocked){
-        snapBack(s.el, inner);
-        if(Math.abs(s.dx) > 40) toast('Locked folder delete nahi ho sakta', 1);
-      } else {
+      if(isLocked){ snapBack(s.el, inner); if(Math.abs(s.dx) > 40) toast('Locked folder delete nahi ho sakta', 1); }
+      else {
         const committed = Math.abs(s.dx) > s.width * COMMIT_RATIO || s.velocity < -COMMIT_VELOCITY;
-        if(committed){
-          const ftype = s.el.dataset.folderType;
-          const fkey = parseInt(s.el.dataset.folderKey);
-          commitDelete(s.el, inner, s.dx, s.velocity, () => {
-            if(ftype && !isNaN(fkey)) performFolderDelete(ftype, fkey);
-          });
-        } else { snapBack(s.el, inner); }
+        if(committed){ const ftype = s.el.dataset.folderType; const fkey = parseInt(s.el.dataset.folderKey); commitDelete(s.el, inner, s.dx, s.velocity, () => { if(ftype && !isNaN(fkey)) performFolderDelete(ftype, fkey); }); }
+        else { snapBack(s.el, inner); }
       }
-    } else {
-      s.el.style.touchAction = 'pan-y';
-      s.el.style.willChange = 'auto';
-    }
+    } else { s.el.style.touchAction = 'pan-y'; s.el.style.willChange = 'auto'; }
   }
 }
-
 document.addEventListener('touchstart', handleTouchStart, {passive:true});
 document.addEventListener('touchmove', handleTouchMove, {passive:false});
 document.addEventListener('touchend', handleTouchEnd, {passive:true});
 document.addEventListener('touchcancel', handleTouchEnd, {passive:true});
 
-/* ================= SHELL REVEAL ================= */
 function revealShell(shellId){ const shell = document.getElementById(shellId); if (shell) shell.classList.add('loaded'); }
 function revealAll(){ revealShell('shell-all'); revealShell('shell-weekly'); revealShell('shell-monthly'); }
 
-/* ================= INIT ================= */
+/* ========= ANDROID WEBVIEW SCROLLBAR FORCE-KILLER ========= */
+function killAllScrollbars(){
+  try{
+    const all = document.querySelectorAll('*');
+    for(let i=0;i<all.length;i++){
+      const el = all[i];
+      const cs = getComputedStyle(el);
+      const oy = cs.overflowY;
+      const ox = cs.overflowX;
+      const scrollableY = (oy === 'auto' || oy === 'scroll');
+      const scrollableX = (ox === 'auto' || ox === 'scroll');
+      if(scrollableY || scrollableX){
+        el.style.setProperty('scrollbar-width','none','important');
+        el.style.setProperty('-ms-overflow-style','none','important');
+        el.style.setProperty('-webkit-overflow-scrolling','auto','important');
+      }
+    }
+  }catch(e){}
+}
+killAllScrollbars();
+['renderAll','renderWeekly','renderMonthly','renderStore','openFolderDetail','openStore'].forEach(function(fn){
+  if(typeof window[fn] === 'function'){
+    const orig = window[fn];
+    window[fn] = function(){
+      const r = orig.apply(this, arguments);
+      setTimeout(killAllScrollbars, 50);
+      return r;
+    };
+  }
+});
+setInterval(killAllScrollbars, 1200);
+try{
+  const mo = new MutationObserver(function(){ killAllScrollbars(); });
+  mo.observe(document.body, {childList:true, subtree:true});
+}catch(e){}
+
 getCurrentWeekFolder();
 getCurrentMonthFolder();
 saveStore();
@@ -1654,7 +1571,7 @@ renderWeekly();
 renderMonthly();
 updateStoreCount();
 setScrollPadding();
-requestAnimationFrame(() => { setTimeout(() => { revealAll(); setScrollPadding(); }, 80); });
+requestAnimationFrame(() => { setTimeout(() => { revealAll(); setScrollPadding(); killAllScrollbars(); }, 80); });
 setInterval(() => { autoArchive(); }, 60000);
 </script>
 </body>
